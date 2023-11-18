@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-idiomatic-order"
+  ],
+  "rules": {
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "custom-property-empty-line-before": null,
+    "keyframes-name-pattern": null,
+    "color-function-notation": null,
+    "alpha-value-notation": null,
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "scss/double-slash-comment-whitespace-inside": null,
+    "media-feature-range-notation": null,
+    "no-empty-source": null,
+    "color-hex-length": null
+  }
+}

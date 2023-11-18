@@ -1,0 +1,3 @@
+# Stylelintの監視対象から外す
+
+node_modules/
