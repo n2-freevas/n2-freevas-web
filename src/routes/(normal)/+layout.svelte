@@ -4,7 +4,6 @@
   import HeaderMenuBox from "$lib/component/HeaderMenuBox.svelte";
   import HambergerMenuBox from "$lib/component/HambergerMenuBox.svelte";
   import ToastArea from "$lib/component/toast/ToastArea.svelte";
-  import SEO from "$lib/component/seo/index.svelte";
 
   let sliderOpen = false;
 
@@ -22,12 +21,6 @@
 </script>
 
 <svelte:window bind:innerWidth />
-
-<!-- <SEO
-  title="n2.freevas"
-  slug=""
-  metadescription="n2.freevas / official site / top page"
-/> -->
 
 <header>
   <div class="n2-logo">

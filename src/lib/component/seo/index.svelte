@@ -3,7 +3,6 @@
   import { MetaTags } from "svelte-meta-tags";
   import { page } from "$app/stores";
 
-  console.log($page);
   export let title: string;
   export let description: string = OPEN_GRAPH_CONST.default_description;
 

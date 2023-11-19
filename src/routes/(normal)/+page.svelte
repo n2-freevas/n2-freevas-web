@@ -10,7 +10,7 @@
 
 <svelte:window bind:innerWidth />
 
-<SEO title="TOP" />
+<!-- <SEO title="TOP" /> -->
 
 <div id="menu_box">
   {#if innerWidth > 701}

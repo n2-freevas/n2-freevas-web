@@ -6,17 +6,6 @@
   } from "./_components/CarrerCard.svelte";
   import { convertDateToFormatString } from "$lib/util/time";
 
-  // https://github.com/K-Sato1995/svelte-vertical-timeline
-  // import {
-  //   Timeline,
-  //   TimelineItem,
-  //   TimelineSeparator,
-  //   TimelineDot,
-  //   TimelineConnector,
-  //   TimelineContent,
-  //   TimelineOppositeContent,
-  // } from "svelte-vertical-timeline";
-
   const myname = "Taro Nonoyama"; //'Taro <span style="color:#ff0000">N</span>onoyama'
   const mySex = "Male";
   const myBloodType = "A Rh+";
@@ -104,7 +93,7 @@
   ];
 </script>
 
-<SEO title="introduce" />
+<!-- <SEO title="introduce" /> -->
 
 <section>
   <h1>{@html myname}</h1>
