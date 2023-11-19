@@ -33,11 +33,16 @@
       <div class="url">{data.siteUrl}</div>
     </div>
   {:else}
-    <div class="ogp_card_grids">
-      <div class="title sktn" />
-      <div class="description sktn" />
-      <div class="thumbnail sktn" />
-    </div>
+    <a href={url}>
+      <div class="ogp_card_grids">
+        <div class="title sktn" />
+        <div class="description sktn" />
+        <div class="thumbnail sktn" />
+      </div>
+      <div class="corner_box">
+        <div class="url">{url}</div>
+      </div>
+    </a>
   {/if}
 </div>
 
@@ -55,6 +60,7 @@
       position: absolute;
       width: 100%;
       height: 100%;
+      opacity: 0;
       top: 0;
       left: 0;
       border: solid 1px white;
@@ -67,6 +73,7 @@
       background-size: 5px 5px;
       background-position: 0 0, 5px 5px;
       &::before {
+        opacity: 1;
         left: 15px;
         top: -10%;
         width: 105%;
@@ -86,7 +93,7 @@
         "title thumbnail"
         "description thumbnail";
       @media (max-width: 720px) {
-        grid-template-columns: 1fr 150px;
+        grid-template-columns: 1fr 100px;
         grid-template-rows: auto auto;
         grid-template-areas:
           "title thumbnail"
@@ -121,7 +128,6 @@
       }
     }
     .thumbnail {
-      flex-grow: 1;
       grid-area: thumbnail;
       padding-left: 20px;
       display: flex;

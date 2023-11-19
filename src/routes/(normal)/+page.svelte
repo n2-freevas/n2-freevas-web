@@ -35,7 +35,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow: hidden;
   }
   .icon_box {
     display: grid;
@@ -61,6 +60,7 @@
 
     &::before {
       content: "";
+      opacity: 0;
       z-index: 1;
       position: absolute;
       border: solid 1px white;
@@ -71,6 +71,7 @@
     &::after {
       content: "";
       z-index: 0;
+      opacity: 0;
       position: absolute;
       border: solid 1px white;
       height: 100%;
@@ -79,10 +80,14 @@
     }
     &:hover {
       &::before {
-        height: 120%;
-        width: 120%;
+        transform: rotate(-20deg);
+        opacity: 1;
+        height: 112%;
+        width: 112%;
       }
       &::after {
+        transform: rotate(30deg);
+        opacity: 1;
         height: 103%;
         width: 103%;
       }

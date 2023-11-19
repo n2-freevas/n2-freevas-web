@@ -205,6 +205,7 @@
 
         &::before {
           content: "";
+          opacity: 0;
           position: absolute;
           width: 100%;
           height: 100%;
@@ -226,6 +227,7 @@
       .marker {
         .dot {
           &::before {
+            opacity: 1;
             bottom: -5px;
             right: -5px;
             width: 200%;
