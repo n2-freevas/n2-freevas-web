@@ -1,5 +1,5 @@
+/* 各ブラウザに働いているデフォルトのCSS値をリセット */
 @charset "UTF-8";
-/* 各ブラウザに働いているデフォルトのCSS値をリセット*/
 
 *,
 *::before,
@@ -31,12 +31,13 @@ html:focus-within {
 
 body {
     min-height: 100vh;
-    text-rendering: optimizeSpeed;
     line-height: 1.5;
+    text-rendering: optimizespeed;
 }
+
 a {
-    text-decoration: none;
     color: white;
+    text-decoration: none;
 }
 
 a:not([class]) {
@@ -45,8 +46,8 @@ a:not([class]) {
 
 img,
 picture {
-    max-width: 100%;
     display: block;
+    max-width: 100%;
 }
 
 input,
@@ -60,27 +61,27 @@ select {
     html:focus-within {
         scroll-behavior: auto;
     }
+
     *,
     *::before,
     *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
     }
 }
 
 button {
     display: inline-block;
-    border: none;
     padding: none;
+    border: none;
     margin: 0;
-    text-decoration: none;
+    appearance: none;
     background: transparent;
+    cursor: pointer;
     font-family: sans-serif;
     font-size: 1rem;
-    cursor: pointer;
     text-align: center;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    text-decoration: none;
 }
