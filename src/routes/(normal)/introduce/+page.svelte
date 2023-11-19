@@ -93,7 +93,7 @@
   ];
 </script>
 
-<!-- <SEO title="introduce" /> -->
+<SEO title="Introduce" />
 
 <section>
   <h1>{@html myname}</h1>
