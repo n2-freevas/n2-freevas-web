@@ -3,6 +3,7 @@
   import { MetaTags } from "svelte-meta-tags";
   import { page } from "$app/stores";
 
+  console.log($page);
   export let title: string;
   export let description: string = OPEN_GRAPH_CONST.default_description;
 
@@ -19,13 +20,13 @@
     description: description,
     images: [
       {
-        url: OPEN_GRAPH_CONST.default_image.url,
+        url: `${$page.url.host}/${OPEN_GRAPH_CONST.default_image.url}`,
         width: OPEN_GRAPH_CONST.default_image.width,
         height: OPEN_GRAPH_CONST.default_image.height,
         alt: OPEN_GRAPH_CONST.default_image.alt,
       },
       {
-        url: OPEN_GRAPH_CONST.default_image_square.url,
+        url: `${$page.url.host}/${OPEN_GRAPH_CONST.default_image_square.url}`,
         width: OPEN_GRAPH_CONST.default_image_square.width,
         height: OPEN_GRAPH_CONST.default_image_square.height,
         alt: OPEN_GRAPH_CONST.default_image_square.alt,
@@ -39,7 +40,7 @@
     cardType: "summary_large_image",
     title: pageTitle,
     description: description,
-    image: OPEN_GRAPH_CONST.default_image.url,
+    image: `${$page.url.host}/${OPEN_GRAPH_CONST.default_image.url}`,
     imageAlt: OPEN_GRAPH_CONST.default_image.alt,
   }}
 />
