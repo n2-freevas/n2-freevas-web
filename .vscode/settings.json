@@ -17,7 +17,7 @@
     "svelte"
   ],
   "eslint.validate": [
-    "svelte"
+    "svelte", "ts"
   ],
   "[svelte]": {
     "editor.defaultFormatter": "svelte.svelte-vscode"

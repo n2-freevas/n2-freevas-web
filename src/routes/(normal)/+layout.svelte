@@ -97,7 +97,7 @@
     z-index: 100;
     view-transition-name: header;
     .n2-logo {
-      padding: 10px;
+      padding: 10px 10px 10px 20px;
       img {
         height: 30px;
       }
