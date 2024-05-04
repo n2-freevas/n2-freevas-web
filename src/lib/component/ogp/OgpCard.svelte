@@ -11,6 +11,7 @@
       //@ts-ignore
       data = JSON.parse(await (await fetch(`/ogp?url=${url}`)).text())
         .data as GetOgp;
+      console.log(data);
     } catch {
       data = null;
     }
@@ -23,7 +24,7 @@
     <div class="ogp_card_grids">
       <a href={data.siteUrl}>
         <div class="title">{data.title}</div>
-        <div class="description">{data.description}</div>
+        <div class="description">{data.description ?? "--"}</div>
       </a>
       <div class="thumbnail">
         <img src={data.images[0].url} alt={data.images[0].alt} />
@@ -71,7 +72,9 @@
       background-image: radial-gradient(#5e5e5e 20%, transparent 20%),
         radial-gradient(#4c4c4c 20%, transparent 20%);
       background-size: 5px 5px;
-      background-position: 0 0, 5px 5px;
+      background-position:
+        0 0,
+        5px 5px;
       &::before {
         opacity: 1;
         left: 15px;

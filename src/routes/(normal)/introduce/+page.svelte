@@ -69,6 +69,10 @@
           name: "クラシル比較 / リードエンジニア・フロントエンドエンジニア",
           url: "https://hikaku.kurashiru.com/",
         },
+        {
+          name: "クラシル比較 / インタビュー",
+          url: "https://chot-inc.com/service/case/kurashiru-hikaku",
+        },
       ],
     },
     {

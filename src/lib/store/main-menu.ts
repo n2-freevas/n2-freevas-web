@@ -31,13 +31,23 @@ export const mainmenus = writable<MainMenu[]>([
         submenu: []
     },
     {
-        name: 'contact',
+        name: 'X',
         path: 'https://twitter.com/N2_FreeVAS',
         img: '/img/X_icon.svg',
         target: "_blank",
         active: true,
-        explain: '連絡先・SNSアカウントを<br>表示します。',
+        explain: 'Xのアカウントへ遷移します。',
         submenu: []
+    },
+    {
+        name: 'github',
+        img: '/img/github_icon.svg',
+        path: 'https://github.com/n2-freevas',
+        target: "_blank",
+        explain: 'githubプロフィールへ遷移します',
+        active: true,
+        submenu: []
+        
     },
     {
         name: 'web dmg-cnt.',
@@ -47,14 +57,14 @@ export const mainmenus = writable<MainMenu[]>([
         active: true,
         submenu: []
     },
-    {
-        name: 'tcg sim',
-        img: '/img/tcg-sim/card_naname.svg',
-        active: true,
-        path: '/tcg-simulator/game',
-        explain: '適当に作って放置している、任意のTCGを一人回しできるエミュレーター',
-        submenu: []
-    },
+    // {
+    //     name: 'tcg sim',
+    //     img: '/img/tcg-sim/card_naname.svg',
+    //     active: true,
+    //     path: '/tcg-simulator/game',
+    //     explain: '適当に作って放置している、任意のTCGを一人回しできるエミュレーター',
+    //     submenu: []
+    // },
     {
         name: 'bonus',
         path: '/show',
