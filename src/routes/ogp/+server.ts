@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import ogp from 'ogp-parser'
+import ogp from 'open-graph-scraper'
 import { type GetOgp, generate } from '$lib/server/schema'
 
 
@@ -12,19 +12,19 @@ export async function GET(e: RequestEvent) {
   }))
   
   try{
-    const metadata = await ogp(url)
-    const res = {
-      status: 200,
-      data: {
-        title: metadata.ogp['og:title'] ? metadata.ogp['og:title'][0] : metadata.title,
-        description: metadata.ogp['og:description'] ? 
-        metadata.ogp['og:description'][0] :  (metadata.seo['og:description'] ? metadata.seo['og:description'][0] : undefined),
-        images: metadata.ogp['og:image'].map(i=>{return {url: i}}) ?? [],
-        siteName: metadata.ogp['og:site_name'] ? metadata.ogp['og:site_name'][0] : undefined,
-        siteUrl: url
-      }
+    const metadata = await ogp({url: url})
+    const data:GetOgp = {
+        title: metadata.result.ogTitle ?? metadata.result.twitterTitle ?? metadata.result.dcTitle ?? "タイトルなし",
+        description: metadata.result.ogDescription ?? metadata.result.twitterDescription ?? metadata.result.dcDescription ?? "デスクリプションなし",
+        images: metadata.result.ogImage ?? metadata.result.twitterImage ?? [],
+        siteName: metadata.result.ogSiteName ?? "サイト名なし",
+        siteUrl: metadata.result.ogUrl ?? metadata.result.twitterUrl ?? url
+      
     }
-    return new Response(generate<GetOgp>(res))
+    return new Response(generate<GetOgp>({
+      status: 200,
+      data
+    }))
   }catch(e){
     return new Response(generate({
       status: 400,
