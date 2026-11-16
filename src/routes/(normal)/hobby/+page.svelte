@@ -17,7 +17,7 @@
 <SEO title="hobby" />
 
 <div id="menu_box">
-  <MenuGrid menus={[backToTop, ...$hobbymenus]} />
+  <MenuGrid menus={$hobbymenus} />
   <N2Clock position="side" />
 </div>
 

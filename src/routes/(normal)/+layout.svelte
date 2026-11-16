@@ -8,21 +8,21 @@
   let sliderOpen = false;
 
   $: innerWidth = 0;
-  // N2Clock の位置(home / side)を持つページの route id
-  const CLOCK_HOME_ROUTES = ["/(normal)"];
-  const CLOCK_SIDE_ROUTES = ["/(normal)/hobby"];
+  // N2Clock を持つページの route id と、時計の横位置の並び(左から小さい順)
+  const CLOCK_X_ORDER: Record<string, number> = {
+    "/(normal)/hobby": 0, // side: 左端
+    "/(normal)/hobby/clock": 1, // center: 中央
+    "/(normal)": 2, // home: 右寄り
+  };
 
   onNavigate((navigation) => {
     if (!document.startViewTransition) return;
-    const from = navigation.from?.route.id ?? "";
-    const to = navigation.to?.route.id ?? "";
-    // 時計の転がる向きを決める(左へ行くなら反時計回り、戻るなら時計回り)
-    let clockDir = "";
-    if (CLOCK_HOME_ROUTES.includes(from) && CLOCK_SIDE_ROUTES.includes(to))
-      clockDir = "to-side";
-    else if (CLOCK_SIDE_ROUTES.includes(from) && CLOCK_HOME_ROUTES.includes(to))
-      clockDir = "to-home";
-    document.documentElement.dataset.clockDir = clockDir;
+    const fromX = CLOCK_X_ORDER[navigation.from?.route.id ?? ""];
+    const toX = CLOCK_X_ORDER[navigation.to?.route.id ?? ""];
+    // 時計の転がる向きを決める(右へ動くなら時計回り、左へ動くなら反時計回り)
+    if (fromX !== undefined && toX !== undefined && fromX !== toX)
+      document.documentElement.dataset.clockDir = toX > fromX ? "cw" : "ccw";
+    else delete document.documentElement.dataset.clockDir;
 
     return new Promise((resolve) => {
       const transition = document.startViewTransition(async () => {

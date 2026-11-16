@@ -1,6 +1,9 @@
 <script lang="ts">
-  /** home: TOPの定位置 / side: 左側へ寄せた位置(hobby一覧など) */
-  export let position: "home" | "side" | "introduce" = "home";
+  /**
+   * home: TOPの定位置 / side: 左側へ寄せた位置(hobby一覧など)
+   * center: 画面中央に全体表示(hobby/clock)
+   */
+  export let position: "home" | "side" | "introduce" | "center" = "home";
 </script>
 
 <div id="bg_clock">
@@ -53,6 +56,14 @@
       right: 10vw;
       scale: 0.5;
     }
+  }
+  /* 中央表示: ヘッダー(60px)より下の領域に収まるサイズで中央寄せ */
+  #bg_clock .clock-anchor.center {
+    --clock-size: min(92vw, calc(100svh - 60px - 40px), 850px);
+    top: calc(60px + (100svh - 60px - var(--clock-size)) / 2);
+    left: calc(50vw - var(--clock-size) / 2);
+    width: var(--clock-size);
+    height: var(--clock-size);
   }
   #bg_clock #clockbody {
     position: absolute;
@@ -543,7 +554,7 @@
     }
 
     #bg_clock #clockbody img {
-      width: 850px;
+      width: 100%;
     }
 
     // #bg_clock img.insidewheel {

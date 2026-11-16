@@ -84,5 +84,13 @@ export const hobbymenus = writable<MainMenu[]>([
         explain: 'ポケカのダメカンを、Webカメラ上でやっちゃうお手軽ツール。',
         active: true,
         submenu: []
+    },
+    {
+        name: 'clock',
+        img: '/img/n2_clock/time-11.svg',
+        path: '/hobby/clock',
+        explain: 'N2-clockを眺めるだけの画面。',
+        active: true,
+        submenu: []
     }
 ])
