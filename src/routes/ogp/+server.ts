@@ -1,7 +1,6 @@
-import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import ogp from 'open-graph-scraper'
 import { type GetOgp, generate } from '$lib/server/schema'
+import { fetchOgp } from '$lib/server/ogp'
 
 
 export async function GET(e: RequestEvent) {
@@ -12,15 +11,7 @@ export async function GET(e: RequestEvent) {
   }))
   
   try{
-    const metadata = await ogp({url: url})
-    const data:GetOgp = {
-        title: metadata.result.ogTitle ?? metadata.result.twitterTitle ?? metadata.result.dcTitle ?? "タイトルなし",
-        description: metadata.result.ogDescription ?? metadata.result.twitterDescription ?? metadata.result.dcDescription ?? "デスクリプションなし",
-        images: metadata.result.ogImage ?? metadata.result.twitterImage ?? [],
-        siteName: metadata.result.ogSiteName ?? "サイト名なし",
-        siteUrl: metadata.result.ogUrl ?? metadata.result.twitterUrl ?? url
-      
-    }
+    const data = await fetchOgp(url)
     return new Response(generate<GetOgp>({
       status: 200,
       data
