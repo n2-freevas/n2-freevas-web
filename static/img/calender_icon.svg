@@ -1,0 +1,12 @@
+<svg width="271" height="271" viewBox="0 0 271 271" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- とじ具 -->
+<rect x="70" y="18" width="22" height="50" rx="11" fill="white"/>
+<rect x="179" y="18" width="22" height="50" rx="11" fill="white"/>
+<!-- 台紙(上の帯は塗りつぶし、下は枠だけ) -->
+<path fill-rule="evenodd" clip-rule="evenodd" d="M44 42H227C238.046 42 247 50.954 247 62V231C247 242.046 238.046 251 227 251H44C32.954 251 24 242.046 24 231V62C24 50.954 32.954 42 44 42ZM42 104V227C42 230.314 44.686 233 48 233H223C226.314 233 229 230.314 229 227V104H42Z" fill="white"/>
+<!-- 予定の帯(中身は見せない) -->
+<rect x="58" y="120" width="40" height="58" rx="8" fill="white"/>
+<rect x="116" y="158" width="40" height="60" rx="8" fill="white"/>
+<rect x="174" y="120" width="40" height="30" rx="8" fill="white"/>
+<rect x="174" y="164" width="40" height="22" rx="8" fill="white"/>
+</svg>
