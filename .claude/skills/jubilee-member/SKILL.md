@@ -6,8 +6,9 @@ description: jubilee（/jubilee 配下）を使えるメンバーを追加・削
 # jubilee のメンバー管理
 
 jubilee は Google アカウントでログインし、許可リストにあるメールアドレスだけが使える。
-許可リストは Vercel Global Config（2026年7月に Edge Config から改名）の、slug が `jubilee` のストアの
+許可リストは Vercel Global Config（2026年7月に Edge Config から改名）の、slug が `n2-freevas-web-global-config` のストアの
 キー `jubilee_allowed_emails`（メールアドレスの配列）にある。
+このストアは n2-freevas-web 全体で共有する（Hobby プランではストアを1つしか作れないため）。ほかのキーには触らない。
 リストを変えると数秒で反映され、再デプロイは要らない。
 
 仕組みの詳細は `src/lib/server/jubilee/auth.ts` を参照。
@@ -24,12 +25,10 @@ CLI はグローバルに入れず、`npx --yes vercel@65.16.0`（`global-config
    ログインしていなければ、利用者に `npx vercel login` を実行してもらう（ブラウザでの操作が要るため）。
 2. **ストアがあるか確かめる。**
    ```bash
-   npx --yes vercel@65.16.0 global-config list
+   npx --yes vercel@65.16.0 global-config list --scope <チームの slug>
    ```
-   slug が `jubilee` のストアがなければ、利用者の了承を得てから作る。作ったあとは、利用者に Vercel のダッシュボード（Storage）でストアを n2-freevas-web プロジェクトにつないでもらう。つなぐと環境変数 `GLOBAL_CONFIG` が登録され、アプリが許可リストを読めるようになる（反映には再デプロイが要る）。
-   ```bash
-   npx --yes vercel@65.16.0 global-config create jubilee --items '{"jubilee_allowed_emails":[]}'
-   ```
+   ストアは n2-freevas-web プロジェクトにつながっていて、アプリは環境変数 `GLOBAL_CONFIG` から読む。
+   ストアの slug やチームが既定と違うときは、下の表の値を `.env` に書いてもらう。
 3. **動作を確かめる。**
    ```bash
    node .claude/skills/jubilee-member/member.mjs list
@@ -39,8 +38,8 @@ CLI はグローバルに入れず、`npx --yes vercel@65.16.0`（`global-config
 
 | 名前 | 内容 | 既定 |
 | --- | --- | --- |
-| `JUBILEE_GLOBAL_CONFIG` | ストアの slug か ID | `jubilee` |
-| `JUBILEE_VERCEL_SCOPE` | ストアがあるチームの slug | CLI の今のチーム |
+| `JUBILEE_GLOBAL_CONFIG` | ストアの slug か ID | `n2-freevas-web-global-config` |
+| `JUBILEE_VERCEL_SCOPE` | ストアがあるチームの slug（Vercel のアカウントに複数のチームがあるときは必須） | CLI の今のチーム |
 | `JUBILEE_VERCEL_CLI` | Vercel CLI の起動コマンド | `npx --yes vercel@65.16.0` |
 
 - トークンを会話に貼ってもらわない。CLI のログイン情報のファイルの中身も表示しない。

@@ -9,7 +9,7 @@
  *   (add / remove は --dry-run を付けると、変更後のリストを表示するだけで書き込まない)
  *
  * 次の値は環境変数か、リポジトリ直下の .env(git 管理外)で変えられる:
- *   JUBILEE_GLOBAL_CONFIG  Global Config の slug か ID(既定: jubilee)
+ *   JUBILEE_GLOBAL_CONFIG  Global Config の slug か ID(既定: n2-freevas-web-global-config)
  *   JUBILEE_VERCEL_SCOPE   Global Config があるチームの slug(既定: CLI の今のチーム)
  *   JUBILEE_VERCEL_CLI     Vercel CLI の起動コマンド(既定: npx --yes vercel@65.16.0)
  *
@@ -44,7 +44,7 @@ function fail(message) {
 
 const dotenv = loadDotEnv();
 const setting = (name, fallback = "") => process.env[name] || dotenv[name] || fallback;
-const STORE = setting("JUBILEE_GLOBAL_CONFIG", "jubilee");
+const STORE = setting("JUBILEE_GLOBAL_CONFIG", "n2-freevas-web-global-config");
 const SCOPE = setting("JUBILEE_VERCEL_SCOPE");
 const [CLI_BIN, ...CLI_ARGS] = setting("JUBILEE_VERCEL_CLI", DEFAULT_CLI).split(/\s+/).filter(Boolean);
 
