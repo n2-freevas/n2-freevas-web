@@ -12,7 +12,7 @@
 </script>
 
 <script lang="ts">
-  import OgpCard from "$lib/component/ogp/OgpCard.svelte";
+  import OgpCard from "#lib/component/ogp/OgpCard.svelte";
 
   export let props: CarrearCardProps;
 </script>

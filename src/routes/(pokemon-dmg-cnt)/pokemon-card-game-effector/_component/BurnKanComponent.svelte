@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { BurnKan } from '$lib/model/app/PokemonCardGameEffectorStore'
+    import type { BurnKan } from '#lib/model/app/PokemonCardGameEffectorStore'
     export let model: BurnKan
     let moving: boolean = false
     let animate: boolean = false

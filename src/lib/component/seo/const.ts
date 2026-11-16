@@ -1,4 +1,4 @@
-import { WEBSITE_CONST } from '$lib/const/website'
+import { WEBSITE_CONST } from '#lib/const/website.ts'
 
 export type OgImage= {
   url: string

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import HomeButton from "$lib/component/HomeButton.svelte";
-  import { mainmenus } from "$lib/store/main-menu";
-  import N2Clock from "$lib/component/N2Clock.svelte";
-  import SEO from "$lib/component/seo/index.svelte";
+  import HomeButton from "#lib/component/HomeButton.svelte";
+  import { mainmenus } from "#lib/store/main-menu.ts";
+  import N2Clock from "#lib/component/N2Clock.svelte";
+  import SEO from "#lib/component/seo/index.svelte";
 
   let mainmenu_array = $mainmenus;
   $: innerWidth = 0;

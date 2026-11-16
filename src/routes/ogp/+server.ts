@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import ogp from 'open-graph-scraper'
-import { type GetOgp, generate } from '$lib/server/schema'
+import { type GetOgp, generate } from '#lib/server/schema.ts'
 
 
 export async function GET(e: RequestEvent) {
