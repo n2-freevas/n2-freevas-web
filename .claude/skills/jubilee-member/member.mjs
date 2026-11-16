@@ -7,24 +7,27 @@
  *   node .claude/skills/jubilee-member/member.mjs remove a@example.com [...]
  *   (add / remove は --dry-run を付けると、変更後のリストを表示するだけで書き込まない)
  *
- * 必要な値(環境変数、なければリポジトリ直下の .env から読む。どれも git には入れない):
- *   VERCEL_TOKEN            Vercel のアクセストークン(Edge Config を書き換える権限)
- *   JUBILEE_EDGE_CONFIG_ID  Edge Config の ID(ecfg_ で始まる)
- *   VERCEL_TEAM_ID          Edge Config がチームにある場合のチーム ID(個人アカウントなら不要)
+ * Vercel への認証は、Vercel CLI のログイン(`npx vercel login`)をそのまま使う。
+ * 次の値は自動で見つけるが、環境変数かリポジトリ直下の .env で上書きもできる(どれも git には入れない):
+ *   VERCEL_TOKEN            既定: Vercel CLI のログイン情報(com.vercel.cli/auth.json)のトークン
+ *   VERCEL_TEAM_ID          既定: `npx vercel link` で作られる .vercel/project.json の orgId(チームの場合)
+ *   JUBILEE_EDGE_CONFIG_ID  既定: Edge Config が 1 つならそれ。複数あれば名前(slug)が jubilee のもの
  *
  * トークンは画面に出さない。Vercel API の仕様: https://vercel.com/docs/edge-config/vercel-api
  */
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { homedir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const KEY = "jubilee_allowed_emails";
 const API = "https://api.vercel.com/v1/edge-config";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+
 function loadDotEnv() {
-  const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-  const file = resolve(root, ".env");
+  const file = resolve(REPO_ROOT, ".env");
   if (!existsSync(file)) return {};
   const vars = {};
   for (const line of readFileSync(file, "utf8").split("\n")) {
@@ -34,17 +37,72 @@ function loadDotEnv() {
   return vars;
 }
 
-function config() {
+/** Vercel CLI の設定フォルダ(OS ごとの置き場所) */
+function cliConfigDirs() {
+  const home = homedir();
+  return [
+    process.env.XDG_DATA_HOME && join(process.env.XDG_DATA_HOME, "com.vercel.cli"),
+    join(home, "Library", "Application Support", "com.vercel.cli"), // macOS
+    join(home, ".local", "share", "com.vercel.cli"), // Linux
+    process.env.APPDATA && join(process.env.APPDATA, "com.vercel.cli"), // Windows
+  ].filter(Boolean);
+}
+
+function readJson(file) {
+  try {
+    return JSON.parse(readFileSync(file, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+/** Vercel CLI でログインしたときのトークン */
+function cliToken() {
+  for (const dir of cliConfigDirs()) {
+    const auth = readJson(join(dir, "auth.json"));
+    if (auth?.token) return auth.token;
+  }
+  return "";
+}
+
+/** `vercel link` で作られた .vercel/project.json のチーム ID(個人アカウントなら空) */
+function linkedTeamId() {
+  const project = readJson(join(REPO_ROOT, ".vercel", "project.json"));
+  return typeof project?.orgId === "string" && project.orgId.startsWith("team_") ? project.orgId : "";
+}
+
+async function config() {
   const dotenv = loadDotEnv();
   const get = (name) => process.env[name] || dotenv[name] || "";
-  const token = get("VERCEL_TOKEN");
-  const id = get("JUBILEE_EDGE_CONFIG_ID");
-  const missing = [!token && "VERCEL_TOKEN", !id && "JUBILEE_EDGE_CONFIG_ID"].filter(Boolean);
-  if (missing.length) {
-    fail(`${missing.join(", ")} が未設定です(環境変数か .env に設定してください)`);
+
+  const token = get("VERCEL_TOKEN") || cliToken();
+  if (!token) fail("Vercel にログインしていません。`npx vercel login` を実行してください");
+
+  const teamId = get("VERCEL_TEAM_ID") || linkedTeamId();
+  const query = teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
+  const cfg = { token, query, id: get("JUBILEE_EDGE_CONFIG_ID") };
+  if (!cfg.id) cfg.id = await findEdgeConfigId(cfg);
+  return cfg;
+}
+
+/** Edge Config の ID を探す。1 つならそれ、複数なら名前が jubilee のもの */
+async function findEdgeConfigId(cfg) {
+  const res = await request(cfg, `${API}${cfg.query}`);
+  const configs = await res.json();
+  const list = Array.isArray(configs) ? configs : (configs.edgeConfigs ?? []);
+  if (list.length === 1) return list[0].id;
+  const named = list.find((c) => c.slug === "jubilee");
+  if (named) return named.id;
+  if (!list.length) {
+    fail(
+      "Edge Config が見つかりません。Vercel の Storage で作成してプロジェクトにつなぐか、" +
+        "チームの Edge Config なら `npx vercel link` を実行してください",
+    );
   }
-  const teamId = get("VERCEL_TEAM_ID");
-  return { token, id, query: teamId ? `?teamId=${encodeURIComponent(teamId)}` : "" };
+  fail(
+    `Edge Config が複数あります。JUBILEE_EDGE_CONFIG_ID を .env に設定してください: ` +
+      list.map((c) => `${c.slug}(${c.id})`).join(", "),
+  );
 }
 
 function fail(message) {
@@ -52,11 +110,22 @@ function fail(message) {
   process.exit(1);
 }
 
-async function api(cfg, path, init = {}) {
-  const res = await fetch(`${API}/${encodeURIComponent(cfg.id)}${path}${cfg.query}`, {
+async function request(cfg, url, init = {}) {
+  const res = await fetch(url, {
     ...init,
     headers: { authorization: `Bearer ${cfg.token}`, "content-type": "application/json", ...init.headers },
   });
+  if (res.status === 401 || res.status === 403) {
+    fail(
+      `Vercel API ${res.status}: 権限がありません。` +
+        "`npx vercel login` でログインし直すか、チームの Edge Config なら `npx vercel link` を実行してください",
+    );
+  }
+  return res;
+}
+
+async function api(cfg, path, init = {}) {
+  const res = await request(cfg, `${API}/${encodeURIComponent(cfg.id)}${path}${cfg.query}`, init);
   if (res.status === 404 && path.startsWith("/item/")) return null;
   if (!res.ok) fail(`Vercel API ${res.status}: ${await res.text()}`);
   return res.json();
@@ -97,7 +166,7 @@ if (!["list", "add", "remove"].includes(command ?? "")) {
   fail("使い方: member.mjs list | add <email...> | remove <email...> [--dry-run]");
 }
 
-const cfg = config();
+const cfg = await config();
 const current = await readList(cfg);
 
 if (command === "list") {

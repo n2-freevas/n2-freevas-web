@@ -13,17 +13,34 @@ jubilee は Google アカウントでログインし、許可リストにある�
 
 ## 準備（初回だけ）
 
-`node .claude/skills/jubilee-member/member.mjs list` が「未設定です」で失敗したら、足りない値を利用者に設定してもらう。
-値は環境変数か、リポジトリ直下の `.env`（git 管理外）に書く。
+Vercel への認証には、Vercel CLI のログインをそのまま使う。トークンを別に作る必要はない。
 
-| 名前 | 内容 | 取得場所 |
+1. **Vercel CLI でログインしているか確かめる。** CLI はグローバルに入れず、`npx vercel` で使う。
+   ```bash
+   npx vercel whoami
+   ```
+   ログインしていなければ、利用者に `npx vercel login` を実行してもらう（ブラウザでの操作が要るため）。
+2. **Edge Config がチームにある場合は、リポジトリを Vercel のプロジェクトに結び付ける。**
+   ```bash
+   npx vercel link
+   ```
+   `.vercel/project.json`（git 管理外）が作られ、スクリプトはそこからチーム ID を読む。
+   個人アカウントの Edge Config なら不要。
+3. **動作を確かめる。**
+   ```bash
+   node .claude/skills/jubilee-member/member.mjs list
+   ```
+
+スクリプトが値を見つける順番は次のとおり。自動で見つからないときだけ、環境変数かリポジトリ直下の `.env`（git 管理外）に書いてもらう。
+
+| 値 | 自動で使うもの | 上書きする名前 |
 | --- | --- | --- |
-| `VERCEL_TOKEN` | Vercel のアクセストークン | Vercel の Account Settings → Tokens。有効期限を付け、対象をこのチームに絞る |
-| `JUBILEE_EDGE_CONFIG_ID` | Edge Config の ID（`ecfg_` で始まる） | Vercel の Storage → 対象の Edge Config |
-| `VERCEL_TEAM_ID` | チーム ID（Edge Config がチームにある場合だけ） | Vercel の Team Settings → General |
+| 認証トークン | Vercel CLI のログイン情報 | `VERCEL_TOKEN` |
+| チーム ID | `.vercel/project.json` の `orgId` | `VERCEL_TEAM_ID` |
+| Edge Config の ID | Edge Config が1つならそれ。複数あれば名前（slug）が `jubilee` のもの | `JUBILEE_EDGE_CONFIG_ID` |
 
-- **トークンを会話に貼ってもらわない。** 利用者自身に `.env` へ書くか `export` してもらう。
-- 自分でもトークンの値を表示しない（`cat .env` などで中身を出さない）。
+- **トークンを会話に貼ってもらわない。** 自分でもトークンの値や CLI のログイン情報のファイルの中身を表示しない。
+- エラーが「Edge Config が複数あります」なら、表示された候補から jubilee 用の ID を利用者に選んでもらい、`.env` に `JUBILEE_EDGE_CONFIG_ID` を書いてもらう。
 
 ## メンバーを追加する
 
@@ -68,7 +85,8 @@ node .claude/skills/jubilee-member/member.mjs list
   - Edge Config をダッシュボードで直接編集してもよい。値は必ず「文字列の配列」のままにする。
   - キーが消える・配列でなくなると、誰も入れなくなる（安全側に倒す作り）。
 - **うまく書き込めないとき**
-  - スクリプトが `Vercel API 401/403` で失敗したら、トークンの権限・期限・チームの指定（`VERCEL_TEAM_ID`）を疑う。
+  - スクリプトが `Vercel API 401/403` で失敗したら、まず `npx vercel login` でログインし直してもらう。
+  - チームの Edge Config なら、`npx vercel link` で結び付けているかも確かめる。
 - **プレビュー環境**
   - Vercel のプレビュー環境ではアプリのログインを省き、Vercel の Deployment Protection に任せている。
   - プレビュー環境に入れる人は、この許可リストではなく Vercel のチームメンバーで決まる。
