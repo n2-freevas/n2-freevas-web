@@ -62,7 +62,7 @@ CLI はグローバルに入れず、`npx --yes vercel@65.16.0`（`global-config
    ```
 6. **利用者に伝える。**
    - 追加したアドレス
-   - 本人は https://www.n2-freevas.com/jubilee を開き、そのアドレスの Google アカウントでログインすれば使えること
+   - 本人は https://www.n2freevas.com/jubilee を開き、そのアドレスの Google アカウントでログインすれば使えること
    - すでに「このアカウントでは利用できません」と表示されていた人は、ページを開き直せば入れること
 
 ## メンバーを外す

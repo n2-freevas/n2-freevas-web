@@ -16,7 +16,7 @@
   <p class="updated">最終更新日：{UPDATED}</p>
 
   <p>
-    jubilee（https://www.n2-freevas.com/jubilee 以下のページ。以下「本サービス」）の運営者は、
+    jubilee（https://www.n2freevas.com/jubilee 以下のページ。以下「本サービス」）の運営者は、
     本サービスの利用者に関する情報を、以下のとおり取り扱います。
   </p>
 
