@@ -35,10 +35,15 @@ export const variables = defineEnvVars({
       return v;
     },
   },
+  GLOBAL_CONFIG: {
+    description:
+      "Vercel Global Config の接続文字列(プロジェクトに Global Config をつなぐと Vercel が設定する)。" +
+      "jubilee の許可リスト(キー jubilee_allowed_emails)を読む",
+    schema: optional,
+  },
   EDGE_CONFIG: {
     description:
-      "Vercel Edge Config の接続文字列(プロジェクトに Edge Config をつなぐと Vercel が設定する)。" +
-      "jubilee の許可リスト(キー jubilee_allowed_emails)を読む",
+      "Global Config の旧名 Edge Config の時代の接続文字列。GLOBAL_CONFIG が未設定のときだけ使う",
     schema: optional,
   },
   VERCEL_ENV: {

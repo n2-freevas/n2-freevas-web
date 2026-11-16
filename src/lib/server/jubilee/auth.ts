@@ -2,15 +2,16 @@
  * jubilee のログイン・アクセス確認の共通部分。
  *
  * - ログインは Google(google.ts)、ログイン状態は署名付き Cookie(session.ts)。
- * - 誰が入れるかは Vercel Edge Config のキー jubilee_allowed_emails(メールアドレスの配列)で決める。
- *   リストの編集は .claude/skills/jubilee-member の手順で行う。
- * - 設定が足りない・Edge Config が読めないときは、誰も入れない(安全側に倒す)。
+ * - 誰が入れるかは Vercel Global Config(旧名 Edge Config)のキー jubilee_allowed_emails
+ *   (メールアドレスの配列)で決める。リストの編集は .claude/skills/jubilee-member の手順で行う。
+ * - 設定が足りない・Global Config が読めないときは、誰も入れない(安全側に倒す)。
  * - Vercel のプレビュー環境では、Vercel の Deployment Protection に任せてログインを省く。
  */
 import type { Cookies } from "@sveltejs/kit";
-import { createClient, type EdgeConfigClient } from "@vercel/edge-config";
+import { createClient, type GlobalConfigClient } from "@vercel/global-config";
 import {
   EDGE_CONFIG,
+  GLOBAL_CONFIG,
   JUBILEE_GOOGLE_OAUTH_CLIENT_ID,
   JUBILEE_GOOGLE_OAUTH_CLIENT_SECRET,
   JUBILEE_SESSION_SECRET,
@@ -104,25 +105,27 @@ export function safeReturnTo(value: string | null | undefined): string {
 
 // ───────────── 許可リスト ─────────────
 
-let edgeConfig: EdgeConfigClient | null = null;
+/** 新しくつないだ Global Config は GLOBAL_CONFIG、名前変更前につないだものは EDGE_CONFIG に入る */
+const connectionString = GLOBAL_CONFIG ?? EDGE_CONFIG;
+let globalConfig: GlobalConfigClient | null = null;
 
 /** 許可リストに入っているか。読めなければ false(入れない) */
 export async function isAllowed(email: string): Promise<boolean> {
-  if (!EDGE_CONFIG) {
-    console.error("[jubilee] EDGE_CONFIG が未設定のため、誰も入れません");
+  if (!connectionString) {
+    console.error("[jubilee] GLOBAL_CONFIG が未設定のため、誰も入れません");
     return false;
   }
   try {
-    edgeConfig ??= createClient(EDGE_CONFIG);
-    const list = await edgeConfig.get<string[]>(ALLOWLIST_KEY);
+    globalConfig ??= createClient(connectionString);
+    const list = await globalConfig.get<string[]>(ALLOWLIST_KEY);
     if (!Array.isArray(list)) {
-      console.error(`[jubilee] Edge Config に ${ALLOWLIST_KEY}(配列)がありません`);
+      console.error(`[jubilee] Global Config に ${ALLOWLIST_KEY}(配列)がありません`);
       return false;
     }
     const target = email.toLowerCase();
     return list.some((item) => typeof item === "string" && item.trim().toLowerCase() === target);
   } catch (err) {
-    console.error("[jubilee] Edge Config を読めませんでした", err);
+    console.error("[jubilee] Global Config を読めませんでした", err);
     return false;
   }
 }

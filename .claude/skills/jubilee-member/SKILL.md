@@ -1,46 +1,49 @@
 ---
 name: jubilee-member
-description: jubilee（/jubilee 配下）を使えるメンバーを追加・削除・一覧表示する。許可リストは Vercel Edge Config のキー jubilee_allowed_emails にある。「jubilee にメンバーを追加して」「○○さんを jubilee に入れて」「jubilee の利用者を外して」「jubilee に誰が入れるか見せて」などで使う。
+description: jubilee（/jubilee 配下）を使えるメンバーを追加・削除・一覧表示する。許可リストは Vercel Global Config（旧名 Edge Config）のキー jubilee_allowed_emails にある。「jubilee にメンバーを追加して」「○○さんを jubilee に入れて」「jubilee の利用者を外して」「jubilee に誰が入れるか見せて」などで使う。
 ---
 
 # jubilee のメンバー管理
 
 jubilee は Google アカウントでログインし、許可リストにあるメールアドレスだけが使える。
-許可リストは Vercel Edge Config のキー `jubilee_allowed_emails`（メールアドレスの配列）にある。
+許可リストは Vercel Global Config（2026年7月に Edge Config から改名）の、slug が `jubilee` のストアの
+キー `jubilee_allowed_emails`（メールアドレスの配列）にある。
 リストを変えると数秒で反映され、再デプロイは要らない。
 
 仕組みの詳細は `src/lib/server/jubilee/auth.ts` を参照。
 
 ## 準備（初回だけ）
 
-Vercel への認証には、Vercel CLI のログインをそのまま使う。トークンを別に作る必要はない。
+スクリプトは Vercel CLI の `vercel global-config` コマンドを呼ぶだけで、認証は CLI のログインに任せる。
+CLI はグローバルに入れず、`npx --yes vercel@65.16.0`（`global-config` コマンドがある版に固定）で使う。
 
-1. **Vercel CLI でログインしているか確かめる。** CLI はグローバルに入れず、`npx vercel` で使う。
+1. **Vercel CLI でログインしているか確かめる。**
    ```bash
-   npx vercel whoami
+   npx --yes vercel@65.16.0 whoami
    ```
    ログインしていなければ、利用者に `npx vercel login` を実行してもらう（ブラウザでの操作が要るため）。
-2. **Edge Config がチームにある場合は、リポジトリを Vercel のプロジェクトに結び付ける。**
+2. **ストアがあるか確かめる。**
    ```bash
-   npx vercel link
+   npx --yes vercel@65.16.0 global-config list
    ```
-   `.vercel/project.json`（git 管理外）が作られ、スクリプトはそこからチーム ID を読む。
-   個人アカウントの Edge Config なら不要。
+   slug が `jubilee` のストアがなければ、利用者の了承を得てから作る。作ったあとは、利用者に Vercel のダッシュボード（Storage）でストアを n2-freevas-web プロジェクトにつないでもらう。つなぐと環境変数 `GLOBAL_CONFIG` が登録され、アプリが許可リストを読めるようになる（反映には再デプロイが要る）。
+   ```bash
+   npx --yes vercel@65.16.0 global-config create jubilee --items '{"jubilee_allowed_emails":[]}'
+   ```
 3. **動作を確かめる。**
    ```bash
    node .claude/skills/jubilee-member/member.mjs list
    ```
 
-スクリプトが値を見つける順番は次のとおり。自動で見つからないときだけ、環境変数かリポジトリ直下の `.env`（git 管理外）に書いてもらう。
+既定と違う場合だけ、環境変数かリポジトリ直下の `.env`（git 管理外）に書いてもらう。
 
-| 値 | 自動で使うもの | 上書きする名前 |
+| 名前 | 内容 | 既定 |
 | --- | --- | --- |
-| 認証トークン | Vercel CLI のログイン情報 | `VERCEL_TOKEN` |
-| チーム ID | `.vercel/project.json` の `orgId` | `VERCEL_TEAM_ID` |
-| Edge Config の ID | Edge Config が1つならそれ。複数あれば名前（slug）が `jubilee` のもの | `JUBILEE_EDGE_CONFIG_ID` |
+| `JUBILEE_GLOBAL_CONFIG` | ストアの slug か ID | `jubilee` |
+| `JUBILEE_VERCEL_SCOPE` | ストアがあるチームの slug | CLI の今のチーム |
+| `JUBILEE_VERCEL_CLI` | Vercel CLI の起動コマンド | `npx --yes vercel@65.16.0` |
 
-- **トークンを会話に貼ってもらわない。** 自分でもトークンの値や CLI のログイン情報のファイルの中身を表示しない。
-- エラーが「Edge Config が複数あります」なら、表示された候補から jubilee 用の ID を利用者に選んでもらい、`.env` に `JUBILEE_EDGE_CONFIG_ID` を書いてもらう。
+- トークンを会話に貼ってもらわない。CLI のログイン情報のファイルの中身も表示しない。
 
 ## メンバーを追加する
 
@@ -82,11 +85,11 @@ node .claude/skills/jubilee-member/member.mjs list
   - メールアドレスは個人情報。リポジトリ（コード・コミット・PR・README）には書かない。
   - 会話での報告も、必要な範囲にとどめる。
 - **リストを壊さないために**
-  - Edge Config をダッシュボードで直接編集してもよい。値は必ず「文字列の配列」のままにする。
+  - Global Config をダッシュボードで直接編集してもよい。値は必ず「文字列の配列」のままにする。
   - キーが消える・配列でなくなると、誰も入れなくなる（安全側に倒す作り）。
 - **うまく書き込めないとき**
-  - スクリプトが `Vercel API 401/403` で失敗したら、まず `npx vercel login` でログインし直してもらう。
-  - チームの Edge Config なら、`npx vercel link` で結び付けているかも確かめる。
+  - `vercel global-config ... に失敗しました` と出たら、表示された CLI のエラーを読む。
+  - ログイン切れなら `npx vercel login`、ストアが見つからないならチーム（`JUBILEE_VERCEL_SCOPE`）とストアの slug を確かめる。
 - **プレビュー環境**
   - Vercel のプレビュー環境ではアプリのログインを省き、Vercel の Deployment Protection に任せている。
   - プレビュー環境に入れる人は、この許可リストではなく Vercel のチームメンバーで決まる。

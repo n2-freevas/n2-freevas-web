@@ -1,29 +1,29 @@
 #!/usr/bin/env node
 /**
- * jubilee の許可リスト(Vercel Edge Config のキー jubilee_allowed_emails)を見る・変える。
+ * jubilee の許可リスト(Vercel Global Config のキー jubilee_allowed_emails)を見る・変える。
+ * Vercel CLI の `vercel global-config` コマンドを呼ぶだけで、認証は CLI のログインに任せる。
  *
  *   node .claude/skills/jubilee-member/member.mjs list
  *   node .claude/skills/jubilee-member/member.mjs add    a@example.com [b@example.com ...]
  *   node .claude/skills/jubilee-member/member.mjs remove a@example.com [...]
  *   (add / remove は --dry-run を付けると、変更後のリストを表示するだけで書き込まない)
  *
- * Vercel への認証は、Vercel CLI のログイン(`npx vercel login`)をそのまま使う。
- * 次の値は自動で見つけるが、環境変数かリポジトリ直下の .env で上書きもできる(どれも git には入れない):
- *   VERCEL_TOKEN            既定: Vercel CLI のログイン情報(com.vercel.cli/auth.json)のトークン
- *   VERCEL_TEAM_ID          既定: `npx vercel link` で作られる .vercel/project.json の orgId(チームの場合)
- *   JUBILEE_EDGE_CONFIG_ID  既定: Edge Config が 1 つならそれ。複数あれば名前(slug)が jubilee のもの
+ * 次の値は環境変数か、リポジトリ直下の .env(git 管理外)で変えられる:
+ *   JUBILEE_GLOBAL_CONFIG  Global Config の slug か ID(既定: jubilee)
+ *   JUBILEE_VERCEL_SCOPE   Global Config があるチームの slug(既定: CLI の今のチーム)
+ *   JUBILEE_VERCEL_CLI     Vercel CLI の起動コマンド(既定: npx --yes vercel@65.16.0)
  *
- * トークンは画面に出さない。Vercel API の仕様: https://vercel.com/docs/edge-config/vercel-api
+ * CLI の仕様: https://vercel.com/docs/cli/global-config
  */
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const KEY = "jubilee_allowed_emails";
-const API = "https://api.vercel.com/v1/edge-config";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+/** `vercel global-config` が入った版に固定する(グローバルに入れなくても npx で動く) */
+const DEFAULT_CLI = "npx --yes vercel@65.16.0";
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 function loadDotEnv() {
@@ -37,112 +37,57 @@ function loadDotEnv() {
   return vars;
 }
 
-/** Vercel CLI の設定フォルダ(OS ごとの置き場所) */
-function cliConfigDirs() {
-  const home = homedir();
-  return [
-    process.env.XDG_DATA_HOME && join(process.env.XDG_DATA_HOME, "com.vercel.cli"),
-    join(home, "Library", "Application Support", "com.vercel.cli"), // macOS
-    join(home, ".local", "share", "com.vercel.cli"), // Linux
-    process.env.APPDATA && join(process.env.APPDATA, "com.vercel.cli"), // Windows
-  ].filter(Boolean);
-}
-
-function readJson(file) {
-  try {
-    return JSON.parse(readFileSync(file, "utf8"));
-  } catch {
-    return null;
-  }
-}
-
-/** Vercel CLI でログインしたときのトークン */
-function cliToken() {
-  for (const dir of cliConfigDirs()) {
-    const auth = readJson(join(dir, "auth.json"));
-    if (auth?.token) return auth.token;
-  }
-  return "";
-}
-
-/** `vercel link` で作られた .vercel/project.json のチーム ID(個人アカウントなら空) */
-function linkedTeamId() {
-  const project = readJson(join(REPO_ROOT, ".vercel", "project.json"));
-  return typeof project?.orgId === "string" && project.orgId.startsWith("team_") ? project.orgId : "";
-}
-
-async function config() {
-  const dotenv = loadDotEnv();
-  const get = (name) => process.env[name] || dotenv[name] || "";
-
-  const token = get("VERCEL_TOKEN") || cliToken();
-  if (!token) fail("Vercel にログインしていません。`npx vercel login` を実行してください");
-
-  const teamId = get("VERCEL_TEAM_ID") || linkedTeamId();
-  const query = teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
-  const cfg = { token, query, id: get("JUBILEE_EDGE_CONFIG_ID") };
-  if (!cfg.id) cfg.id = await findEdgeConfigId(cfg);
-  return cfg;
-}
-
-/** Edge Config の ID を探す。1 つならそれ、複数なら名前が jubilee のもの */
-async function findEdgeConfigId(cfg) {
-  const res = await request(cfg, `${API}${cfg.query}`);
-  const configs = await res.json();
-  const list = Array.isArray(configs) ? configs : (configs.edgeConfigs ?? []);
-  if (list.length === 1) return list[0].id;
-  const named = list.find((c) => c.slug === "jubilee");
-  if (named) return named.id;
-  if (!list.length) {
-    fail(
-      "Edge Config が見つかりません。Vercel の Storage で作成してプロジェクトにつなぐか、" +
-        "チームの Edge Config なら `npx vercel link` を実行してください",
-    );
-  }
-  fail(
-    `Edge Config が複数あります。JUBILEE_EDGE_CONFIG_ID を .env に設定してください: ` +
-      list.map((c) => `${c.slug}(${c.id})`).join(", "),
-  );
-}
-
 function fail(message) {
   console.error(`エラー: ${message}`);
   process.exit(1);
 }
 
-async function request(cfg, url, init = {}) {
-  const res = await fetch(url, {
-    ...init,
-    headers: { authorization: `Bearer ${cfg.token}`, "content-type": "application/json", ...init.headers },
-  });
-  if (res.status === 401 || res.status === 403) {
+const dotenv = loadDotEnv();
+const setting = (name, fallback = "") => process.env[name] || dotenv[name] || fallback;
+const STORE = setting("JUBILEE_GLOBAL_CONFIG", "jubilee");
+const SCOPE = setting("JUBILEE_VERCEL_SCOPE");
+const [CLI_BIN, ...CLI_ARGS] = setting("JUBILEE_VERCEL_CLI", DEFAULT_CLI).split(/\s+/).filter(Boolean);
+
+/** `vercel global-config <args>` を実行し、--json の出力を返す */
+function vercel(args) {
+  const all = [...CLI_ARGS, "global-config", ...args, "--json", "--non-interactive"];
+  if (SCOPE) all.push("--scope", SCOPE);
+  let out;
+  try {
+    out = execFileSync(CLI_BIN, all, { cwd: REPO_ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  } catch (err) {
+    const detail = String(err.stderr || err.message).trim();
     fail(
-      `Vercel API ${res.status}: 権限がありません。` +
-        "`npx vercel login` でログインし直すか、チームの Edge Config なら `npx vercel link` を実行してください",
+      `vercel global-config ${args[0]} に失敗しました。\n${detail}\n` +
+        "ログインが切れていれば `npx vercel login`、チームが違えば JUBILEE_VERCEL_SCOPE を確かめてください",
     );
   }
-  return res;
+  try {
+    return JSON.parse(out);
+  } catch {
+    fail(`vercel global-config ${args[0]} の出力を JSON として読めませんでした:\n${out}`);
+  }
 }
 
-async function api(cfg, path, init = {}) {
-  const res = await request(cfg, `${API}/${encodeURIComponent(cfg.id)}${path}${cfg.query}`, init);
-  if (res.status === 404 && path.startsWith("/item/")) return null;
-  if (!res.ok) fail(`Vercel API ${res.status}: ${await res.text()}`);
-  return res.json();
+/** items の出力(配列・{items}・{キー: 値} のどれでも)から許可リストを取り出す */
+function extractList(output) {
+  const items = Array.isArray(output) ? output : Array.isArray(output?.items) ? output.items : null;
+  const value = items
+    ? items.find((item) => item?.key === KEY)?.value
+    : output && typeof output === "object"
+      ? output[KEY]
+      : undefined;
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) fail(`${KEY} が配列ではありません: ${JSON.stringify(value)}`);
+  return value.map((v) => String(v).trim().toLowerCase()).filter(Boolean);
 }
 
-async function readList(cfg) {
-  const item = await api(cfg, `/item/${KEY}`);
-  if (!item) return [];
-  if (!Array.isArray(item.value)) fail(`${KEY} が配列ではありません: ${JSON.stringify(item.value)}`);
-  return item.value.map((v) => String(v).trim().toLowerCase()).filter(Boolean);
+function readList() {
+  return extractList(vercel(["items", STORE]));
 }
 
-async function writeList(cfg, list) {
-  await api(cfg, "/items", {
-    method: "PATCH",
-    body: JSON.stringify({ items: [{ operation: "upsert", key: KEY, value: list }] }),
-  });
+function writeList(list) {
+  vercel(["update", STORE, "--patch", JSON.stringify({ items: [{ operation: "upsert", key: KEY, value: list }] })]);
 }
 
 function normalizeEmails(args) {
@@ -154,7 +99,7 @@ function normalizeEmails(args) {
 }
 
 function printList(list) {
-  console.log(`${KEY}(${list.length} 件)`);
+  console.log(`${STORE} / ${KEY}(${list.length} 件)`);
   for (const email of list) console.log(`  - ${email}`);
 }
 
@@ -165,16 +110,15 @@ const args = rest.filter((a) => a !== "--dry-run");
 if (!["list", "add", "remove"].includes(command ?? "")) {
   fail("使い方: member.mjs list | add <email...> | remove <email...> [--dry-run]");
 }
+const emails = command === "list" ? [] : normalizeEmails(args);
 
-const cfg = await config();
-const current = await readList(cfg);
+const current = readList();
 
 if (command === "list") {
   printList(current);
   process.exit(0);
 }
 
-const emails = normalizeEmails(args);
 let next;
 if (command === "add") {
   const added = emails.filter((e) => !current.includes(e));
@@ -198,6 +142,6 @@ if (dryRun) {
   process.exit(0);
 }
 
-await writeList(cfg, next);
+writeList(next);
 // 書き込めたかを読み直して確かめる
-printList(await readList(cfg));
+printList(readList());
