@@ -31,12 +31,12 @@ export const mainmenus = writable<MainMenu[]>([
         submenu: []
     },
     {
-        name: 'X',
-        path: 'https://twitter.com/N2_FreeVAS',
-        img: '/img/X_icon.svg',
+        name: 'LinkedIn',
+        path: 'https://www.linkedin.com/in/%E5%A4%AA%E9%83%8E-%E9%87%8E%E3%80%85%E5%B1%B1-05b20534a/',
+        img: '/img/linkedin-svgrepo-com.svg',
         target: "_blank",
         active: true,
-        explain: 'Xのアカウントへ遷移します。',
+        explain: 'LinkedInのアカウントへ遷移します。',
         submenu: []
     },
     {

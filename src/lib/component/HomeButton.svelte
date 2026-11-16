@@ -21,16 +21,17 @@
   <a href={model.active ? model.path : ""} target={model.target}>
     <div
       class="homebutton_background {isFocus && model.active ? 'focus' : ''}"
-    />
+    ></div>
     <div class="icons">
       <img src={model.img} alt="{model.explain}ボタン" />
       <h1>{model.name}</h1>
     </div>
     <div
       class="hover_area"
+      role="presentation"
       on:mouseenter={focusInteractionON}
       on:mouseleave={focusInteractionOFF}
-    />
+    ></div>
   </a>
   {#if !model.active}
     <p>comming soon</p>
@@ -42,7 +43,7 @@
     z-index: 1;
     position: relative;
     background: white;
-    border-radius: 15px;
+    border-radius: 40px;
     // margin: 10px;
     transition: 0.5s;
     &.focus {
@@ -66,7 +67,7 @@
       height: calc(100% - (var(--topval) * 2));
 
       img {
-        height: 60%;
+        height: 55%;
         margin: 0 auto;
       }
       h1 {
@@ -84,10 +85,13 @@
       width: calc(100% - (var(--positioning) * 2));
       height: calc(100% - (var(--positioning) * 2));
       background: black;
-      background-image: radial-gradient(#303030 20%, transparent 20%),
+      background-image:
+        radial-gradient(#303030 20%, transparent 20%),
         radial-gradient(#4c4c4c 20%, transparent 20%);
       background-size: 5px 5px;
-      background-position: 0 0, 5px 5px;
+      background-position:
+        0 0,
+        5px 5px;
       border-radius: 25px;
       transition: 0.3s;
 

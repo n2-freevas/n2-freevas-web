@@ -50,10 +50,13 @@
       grid-template-rows: 170px 170px 170px;
       padding: 30px 40px;
     }
-    background-image: radial-gradient(#5e5e5e 20%, transparent 20%),
+    background-image:
+      radial-gradient(#5e5e5e 20%, transparent 20%),
       radial-gradient(#4c4c4c 20%, transparent 20%);
     background-size: 5px 5px;
-    background-position: 0 0, 5px 5px;
+    background-position:
+      0 0,
+      5px 5px;
 
     position: relative;
     z-index: 2;
