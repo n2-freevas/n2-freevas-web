@@ -42,27 +42,35 @@ export function driveMediaUrl(fileId: string, apiKey: string): string {
   return apiUrl(fileId, apiKey, { alt: "media" });
 }
 
+/** Drive 上のファイルのページ(ここから動画をダウンロードできる) */
+export function driveViewUrl(fileId: string): string {
+  return `https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`;
+}
+
+/**
+ * 読み込む前に開けるかどうか確かめた結果。
+ * - offline:  Google Drive に接続できなかった
+ * - notFound: 見つからない(非公開・リンクの誤り)
+ * - notVideo: 動画ファイルではない
+ * - limited:  それ以外のエラー。多くは Drive のダウンロード上限や API の利用制限
+ */
+export type DriveProblem = "offline" | "notFound" | "notVideo" | "limited";
+
 /**
  * 読み込む前にファイル情報を取りに行き、開けるかどうかを確かめる。
- * <video> のエラーからは原因がわからないので、非公開・キーの制限などをここで見分ける。
- * @returns 問題なければ null、問題があれば画面に出す文言
+ * <video> のエラーからは原因がわからないので、非公開・利用制限などをここで見分ける。
+ * @returns 問題なければ null
  */
-export async function checkDriveFile(fileId: string, apiKey: string): Promise<string | null> {
+export async function checkDriveFile(fileId: string, apiKey: string): Promise<DriveProblem | null> {
   let res: Response;
   try {
     res = await fetch(apiUrl(fileId, apiKey, { fields: "mimeType" }));
   } catch {
-    return "Google Drive に接続できませんでした。通信環境を確認してください。";
+    return "offline";
   }
-  if (res.status === 404) {
-    return "動画が見つかりません。共有設定が「リンクを知っている全員」になっているか確認してください。";
-  }
-  if (!res.ok) {
-    return "Google Drive の動画を読み込めませんでした。時間をおいてもう一度試してください。";
-  }
+  if (res.status === 404) return "notFound";
+  if (!res.ok) return "limited";
   const { mimeType } = (await res.json()) as { mimeType?: string };
-  if (mimeType && !mimeType.startsWith("video/")) {
-    return "このリンクは動画ファイルではありません。";
-  }
+  if (mimeType && !mimeType.startsWith("video/")) return "notVideo";
   return null;
 }
