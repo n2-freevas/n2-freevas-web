@@ -1,8 +1,8 @@
 <script lang="ts">
-  import OgpCard from "$lib/component/ogp/OgpCard.svelte";
+  import OgpCard from "#lib/component/ogp/OgpCard.svelte";
 
   import type { CarrearCardProps } from "../_data";
-  import type { GetOgp } from "$lib/server/schema";
+  import type { GetOgp } from "#lib/server/schema.ts";
 
   export let props: CarrearCardProps;
   export let ogp: Record<string, GetOgp | null> = {};

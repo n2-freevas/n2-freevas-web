@@ -1,12 +1,12 @@
 <script lang="ts">
   import { OPEN_GRAPH_CONST, TWITTER_GRAPH_CONST } from "./const";
   import { MetaTags } from "svelte-meta-tags";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
 
   export let title: string;
   export let description: string = OPEN_GRAPH_CONST.default_description;
 
-  const siteUrl = $page.url.href;
+  const siteUrl = page.url.href;
   const pageTitle = `${title} / ${OPEN_GRAPH_CONST.site_name}`;
 </script>
 

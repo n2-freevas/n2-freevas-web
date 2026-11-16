@@ -33,12 +33,12 @@ body {
 	display: none;
 }
 
-.com_scroll-x::-webkit-scrollbar-piece {
+.com_scroll-x::-webkit-scrollbar-track-piece {
 	background: gray;
 }
 
 /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
-.com_scroll-x::-webkit-scrollbar-piece:start{
+.com_scroll-x::-webkit-scrollbar-track-piece:start{
 	background: gray;
 }
 

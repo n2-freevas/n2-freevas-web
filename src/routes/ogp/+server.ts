@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { type GetOgp, generate } from '$lib/server/schema'
-import { fetchOgp } from '$lib/server/ogp'
+import { type GetOgp, generate } from '#lib/server/schema.ts'
+import { fetchOgp } from '#lib/server/ogp.ts'
 
 
 export async function GET(e: RequestEvent) {

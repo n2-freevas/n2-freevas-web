@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import SEO from "$lib/component/seo/index.svelte";
+  import SEO from "#lib/component/seo/index.svelte";
 
   /**
    * <sports-video-player> の本体(Webコンポーネント)。

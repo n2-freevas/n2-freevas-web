@@ -1,5 +1,5 @@
 import ogp from 'open-graph-scraper';
-import type { GetOgp } from '$lib/server/schema';
+import type { GetOgp } from '#lib/server/schema.ts';
 
 export async function fetchOgp(url: string): Promise<GetOgp> {
   const metadata = await ogp({ url });

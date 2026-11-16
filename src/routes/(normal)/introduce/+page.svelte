@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import SEO from "$lib/component/seo/index.svelte";
+  import SEO from "#lib/component/seo/index.svelte";
   import CarrerCard from "./_components/CarrerCard.svelte";
-  import { convertDateToFormatString } from "$lib/util/time";
-  import N2Clock from "$lib/component/N2Clock.svelte";
+  import { convertDateToFormatString } from "#lib/util/time.ts";
+  import N2Clock from "#lib/component/N2Clock.svelte";
 
   export let data;
 

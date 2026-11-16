@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, onMount } from 'svelte'
     import DamageKanComponent from './DamageKanComponent.svelte'
-    import type { PoisonKan, BurnKan, DamageKan } from '$lib/model/app/PokemonCardGameEffectorStore'
+    import type { PoisonKan, BurnKan, DamageKan } from '#lib/model/app/PokemonCardGameEffectorStore'
     import PoisonKanComponent from './PoisonKanComponent.svelte'
     import BurnKanComponent from './BurnKanComponent.svelte'
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MainMenu } from "$lib/store/main-menu";
+  import type { MainMenu } from "#lib/store/main-menu.ts";
   export let model: MainMenu;
   export let size: number = 100;
   let isFocus = false;

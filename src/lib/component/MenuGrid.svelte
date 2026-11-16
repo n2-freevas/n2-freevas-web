@@ -1,6 +1,6 @@
 <script lang="ts">
-  import HomeButton from "$lib/component/HomeButton.svelte";
-  import type { MainMenu } from "$lib/store/main-menu";
+  import HomeButton from "#lib/component/HomeButton.svelte";
+  import type { MainMenu } from "#lib/store/main-menu.ts";
 
   export let menus: MainMenu[];
   $: innerWidth = 0;

@@ -1,6 +1,6 @@
 import type { PageServerLoad } from "./$types";
-import type { GetOgp } from "$lib/server/schema";
-import { fetchOgp } from "$lib/server/ogp";
+import type { GetOgp } from "#lib/server/schema.ts";
+import { fetchOgp } from "#lib/server/ogp.ts";
 import { CARRER_CARD_DATA } from "./_data";
 
 // ビルド時にOGPを取得して静的HTMLに埋め込む (SSG)
