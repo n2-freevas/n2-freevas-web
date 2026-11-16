@@ -18,11 +18,11 @@ export const variables = defineEnvVars({
   // ───────────── jubilee のログイン(サーバー側だけで使う) ─────────────
   // どれかが未設定なら、jubilee には誰も入れない(安全側に倒す)
 
-  JUBILEE_GOOGLE_CLIENT_ID: {
+  JUBILEE_GOOGLE_OAUTH_CLIENT_ID: {
     description: "jubilee の Google ログインに使う OAuth クライアント ID",
     schema: optional,
   },
-  JUBILEE_GOOGLE_CLIENT_SECRET: {
+  JUBILEE_GOOGLE_OAUTH_CLIENT_SECRET: {
     description: "jubilee の Google ログインに使う OAuth クライアントシークレット",
     schema: optional,
   },

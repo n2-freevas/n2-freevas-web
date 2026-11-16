@@ -11,8 +11,8 @@ import type { Cookies } from "@sveltejs/kit";
 import { createClient, type EdgeConfigClient } from "@vercel/edge-config";
 import {
   EDGE_CONFIG,
-  JUBILEE_GOOGLE_CLIENT_ID,
-  JUBILEE_GOOGLE_CLIENT_SECRET,
+  JUBILEE_GOOGLE_OAUTH_CLIENT_ID,
+  JUBILEE_GOOGLE_OAUTH_CLIENT_SECRET,
   JUBILEE_SESSION_SECRET,
   VERCEL_ENV,
 } from "$app/env/private";
@@ -34,10 +34,10 @@ const BASE_COOKIE = { httpOnly: true, secure: true, sameSite: "lax" } as const;
 export const authSkipped = VERCEL_ENV === "preview";
 
 export function googleClient(origin: string): GoogleClient | null {
-  if (!JUBILEE_GOOGLE_CLIENT_ID || !JUBILEE_GOOGLE_CLIENT_SECRET) return null;
+  if (!JUBILEE_GOOGLE_OAUTH_CLIENT_ID || !JUBILEE_GOOGLE_OAUTH_CLIENT_SECRET) return null;
   return {
-    clientId: JUBILEE_GOOGLE_CLIENT_ID,
-    clientSecret: JUBILEE_GOOGLE_CLIENT_SECRET,
+    clientId: JUBILEE_GOOGLE_OAUTH_CLIENT_ID,
+    clientSecret: JUBILEE_GOOGLE_OAUTH_CLIENT_SECRET,
     redirectUri: `${origin}/jubilee/auth/callback`,
   };
 }
