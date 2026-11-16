@@ -29,8 +29,10 @@
 		"#lib/*": "./src/lib/*"
 	},
 	"dependencies": {
+		"@vercel/blob": "^2.8.2",
 		"@vercel/global-config": "^1.5.1",
 		"@zerodevx/svelte-toast": "^0.9.6",
+		"ical.js": "^2.2.1",
 		"open-graph-scraper": "^6.9.0",
 		"prettier-plugin-svelte": "^3.3.3",
 		"stylelint": "^16.14.1",
