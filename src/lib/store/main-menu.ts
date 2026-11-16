@@ -55,7 +55,15 @@ export const mainmenus = writable<MainMenu[]>([
         explain: 'githubプロフィールへ遷移します',
         active: true,
         submenu: []
-        
+
+    },
+    {
+        name: 'calender',
+        path: '/calender',
+        img: '/img/calender_icon.svg',
+        active: true,
+        explain: 'Taro Nonoyamaの予定の埋まり具合です。<br>内容は非公開。',
+        submenu: []
     },
     // {
     //     name: 'tcg sim',
