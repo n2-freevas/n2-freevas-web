@@ -3,6 +3,7 @@
   import SEO from "$lib/component/seo/index.svelte";
   import CarrerCard from "./_components/CarrerCard.svelte";
   import { convertDateToFormatString } from "$lib/util/time";
+  import N2Clock from "$lib/component/N2Clock.svelte";
 
   export let data;
 
@@ -98,6 +99,8 @@
     </div>
   {/each}
 </section>
+
+<N2Clock position="introduce" />
 
 <div style="padding: 50px 0" />
 

@@ -88,3 +88,57 @@ body {
     transform: translateX(100%)
 	}
 }
+
+/* ===== N2Clock: TOP <-> hobby のスライド遷移 =====
+ * 位置の移動は ::view-transition-group が自動でモーフする。
+ * 中身(スナップショット)には転がるような回転を付ける。
+ * 時計の歯車は30°刻みで並んでいるので、120°ずれた新旧を重ねても見た目が揃う。
+ */
+html[data-clock-dir] {
+  &::view-transition-group(n2-clock),
+  &::view-transition-old(n2-clock),
+  &::view-transition-new(n2-clock) {
+    animation-duration: 0.9s;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.25, 1);
+  }
+}
+html[data-clock-dir="to-side"] {
+  &::view-transition-old(n2-clock) {
+    animation-name: clock-roll-ccw-out, clock-fade-out;
+  }
+  &::view-transition-new(n2-clock) {
+    animation-name: clock-roll-ccw-in, clock-fade-in;
+  }
+}
+html[data-clock-dir="to-home"] {
+  &::view-transition-old(n2-clock) {
+    animation-name: clock-roll-cw-out, clock-fade-out;
+  }
+  &::view-transition-new(n2-clock) {
+    animation-name: clock-roll-cw-in, clock-fade-in;
+  }
+}
+@keyframes clock-roll-ccw-out {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-120deg); }
+}
+@keyframes clock-roll-ccw-in {
+  from { transform: rotate(120deg); }
+  to { transform: rotate(0deg); }
+}
+@keyframes clock-roll-cw-out {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(120deg); }
+}
+@keyframes clock-roll-cw-in {
+  from { transform: rotate(-120deg); }
+  to { transform: rotate(0deg); }
+}
+@keyframes clock-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes clock-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

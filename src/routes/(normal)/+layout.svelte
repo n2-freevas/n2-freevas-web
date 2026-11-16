@@ -8,13 +8,30 @@
   let sliderOpen = false;
 
   $: innerWidth = 0;
-  onNavigate(() => {
+  // N2Clock の位置(home / side)を持つページの route id
+  const CLOCK_HOME_ROUTES = ["/(normal)"];
+  const CLOCK_SIDE_ROUTES = ["/(normal)/hobby"];
+
+  onNavigate((navigation) => {
     if (!document.startViewTransition) return;
+    const from = navigation.from?.route.id ?? "";
+    const to = navigation.to?.route.id ?? "";
+    // 時計の転がる向きを決める(左へ行くなら反時計回り、戻るなら時計回り)
+    let clockDir = "";
+    if (CLOCK_HOME_ROUTES.includes(from) && CLOCK_SIDE_ROUTES.includes(to))
+      clockDir = "to-side";
+    else if (CLOCK_SIDE_ROUTES.includes(from) && CLOCK_HOME_ROUTES.includes(to))
+      clockDir = "to-home";
+    document.documentElement.dataset.clockDir = clockDir;
+
     return new Promise((resolve) => {
-      document.startViewTransition(async () => {
+      const transition = document.startViewTransition(async () => {
         resolve();
         //@ts-ignore
         await navigation.complete;
+      });
+      transition.finished.finally(() => {
+        delete document.documentElement.dataset.clockDir;
       });
     });
   });

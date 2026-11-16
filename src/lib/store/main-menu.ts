@@ -31,6 +31,14 @@ export const mainmenus = writable<MainMenu[]>([
         submenu: []
     },
     {
+        name: 'hobby',
+        path: '/hobby',
+        img: '/img/hobby_icon.svg',
+        active: true,
+        explain: '趣味で作ったツールなどの一覧です。',
+        submenu: []
+    },
+    {
         name: 'LinkedIn',
         path: 'https://www.linkedin.com/in/%E5%A4%AA%E9%83%8E-%E9%87%8E%E3%80%85%E5%B1%B1-05b20534a/',
         img: '/img/linkedin-svgrepo-com.svg',
@@ -49,14 +57,6 @@ export const mainmenus = writable<MainMenu[]>([
         submenu: []
         
     },
-    {
-        name: 'web dmg-cnt.',
-        img: '/img/pokeca/icon_white.svg',
-        path: '/pokemon-card-game-effector',
-        explain: 'ポケカのダメカンを、Webカメラ上でやっちゃうお手軽ツール。',
-        active: true,
-        submenu: []
-    },
     // {
     //     name: 'tcg sim',
     //     img: '/img/tcg-sim/card_naname.svg',
@@ -67,10 +67,22 @@ export const mainmenus = writable<MainMenu[]>([
     // },
     {
         name: 'bonus',
-        path: '/show',
+        path: '/bonus',
         img: '/img/bonus.svg',
         active: true,
         explain: 'CSSでつくったおもちゃなど',
+        submenu: []
+    }
+])
+
+/* hobby配下の一覧 */
+export const hobbymenus = writable<MainMenu[]>([
+    {
+        name: 'web dmg-cnt.',
+        img: '/img/pokeca/icon_white.svg',
+        path: '/pokemon-card-game-effector',
+        explain: 'ポケカのダメカンを、Webカメラ上でやっちゃうお手軽ツール。',
+        active: true,
         submenu: []
     }
 ])
