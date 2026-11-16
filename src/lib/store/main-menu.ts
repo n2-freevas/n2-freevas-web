@@ -66,11 +66,11 @@ export const mainmenus = writable<MainMenu[]>([
     //     submenu: []
     // },
     {
-        name: 'bonus',
+        name: 'e.o.w',
         path: '/bonus',
         img: '/img/bonus.svg',
         active: true,
-        explain: 'CSSでつくったおもちゃなど',
+        explain: '末筆として。',
         submenu: []
     }
 ])

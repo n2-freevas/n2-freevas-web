@@ -16,9 +16,14 @@
 <section class="show-room">
   <PendulumLoader numof_pendulum={20} initial_length={50} />
   <div class="explain-box com_scroll-shader com_is-vertical">
-    <p>振り子は、紐の長さで周期が変わります。</p>
+    <p>この度は、当サイトにアクセスしていただき、誠にありがとうございます。</p>
+    <p>ここには、妙な振り子しかありませんが、ごゆっくりお過ごしください。</p>
+    <hr style="margin: 20px 0; height: 1px;" />
     <p>
-      ここにあるのは、紐の長さが等幅に異なる複数の振り子を、同時に振らせたもので、あなたの使用しているこのブラウザ上で計算を行っています。
+      ところで、振り子は、紐の長さで周期・つまり1往復するまでの時間が変わるのを知っているでしょうか？
+    </p>
+    <p>
+      ここにあるのは、紐の長さが等幅に異なる複数の振り子を、同時に振らせたもので、あなたが今使用しているブラウザ上で計算を行っています。
     </p>
     <p>この振り子たちが減衰なく同時に振れる時、驚きの動きをします。</p>
     <p>
@@ -44,7 +49,7 @@
 
     .explain-box {
       max-width: 500px;
-      height: 150px;
+      height: 200px;
       overflow-y: scroll;
       padding-right: 8px;
       padding-bottom: 32px;
@@ -72,7 +77,7 @@
 
       p {
         padding: 4px 0;
-        font-size: 15px;
+        font-size: 13px;
       }
       .shade {
         height: 20px;
