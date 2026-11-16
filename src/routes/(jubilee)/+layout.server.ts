@@ -2,10 +2,10 @@
  * jubilee 配下のアクセス確認。ページを開くたび(ページ移動のたびも)に行う。
  *   ログインしていない → Google ログインへ
  *   許可リストにない → 利用できない旨のページへ
- * 認証用のページ(/jubilee/auth/...)はそのまま通す。
+ * 認証用のページ(/jubilee/auth/...)とプライバシーポリシーはそのまま通す。
  */
 import { redirect } from "@sveltejs/kit";
-import { authSkipped, isAllowed, readSessionEmail } from "#lib/server/jubilee/auth.ts";
+import { authSkipped, isAllowed, isPublicPath, readSessionEmail } from "#lib/server/jubilee/auth.ts";
 import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ url, cookies, setHeaders }) => {
@@ -18,7 +18,7 @@ export const load: LayoutServerLoad = async ({ url, cookies, setHeaders }) => {
   if (authSkipped) return { email: null, authSkipped: true };
 
   const email = await readSessionEmail(cookies);
-  if (path.startsWith("/jubilee/auth")) return { email, authSkipped: false };
+  if (isPublicPath(path)) return { email, authSkipped: false };
 
   if (!email) {
     redirect(303, `/jubilee/auth/login?returnTo=${encodeURIComponent(path + url.search)}`);

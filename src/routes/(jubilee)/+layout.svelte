@@ -40,6 +40,9 @@
   <main>
     {@render children()}
   </main>
+  <footer>
+    <a href="/jubilee/privacy">プライバシーポリシー</a>
+  </footer>
 </div>
 
 <style lang="scss">
@@ -126,6 +129,16 @@
       color: #555;
       font-size: 12px;
       cursor: pointer;
+    }
+  }
+
+  footer {
+    padding: 24px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    text-align: center;
+    a {
+      color: #666;
+      font-size: 12px;
+      text-underline-offset: 3px;
     }
   }
 

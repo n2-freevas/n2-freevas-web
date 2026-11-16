@@ -1,6 +1,6 @@
 /**
  * Google ログイン(OpenID Connect の認可コードフロー + PKCE)。
- * 求める権限は openid / email / profile だけ(Google の審査が要らない範囲)。
+ * 求める権限は openid / email だけ(Google の審査が要らない範囲。プライバシーポリシーもこの前提)。
  */
 import { decodeJwtPayload, pkceChallenge } from "./session";
 
@@ -24,7 +24,7 @@ export async function authorizationUrl(
     client_id: client.clientId,
     redirect_uri: client.redirectUri,
     response_type: "code",
-    scope: "openid email profile",
+    scope: "openid email",
     state,
     code_challenge: await pkceChallenge(codeVerifier),
     code_challenge_method: "S256",

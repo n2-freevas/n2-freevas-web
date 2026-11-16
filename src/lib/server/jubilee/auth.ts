@@ -42,6 +42,11 @@ export function googleClient(origin: string): GoogleClient | null {
   };
 }
 
+/** ログインなしで見られるページ(認証用のページと、プライバシーポリシー) */
+export function isPublicPath(path: string): boolean {
+  return path.startsWith("/jubilee/auth") || path === "/jubilee/privacy";
+}
+
 // ───────────── ログイン状態 ─────────────
 
 export async function readSessionEmail(cookies: Cookies): Promise<string | null> {
