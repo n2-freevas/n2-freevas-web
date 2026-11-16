@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import SEO from "#lib/component/seo/index.svelte";
-  import CarrerCard, {
-    type CarrearCardProps,
-  } from "./_components/CarrerCard.svelte";
+  import CarrerCard from "./_components/CarrerCard.svelte";
   import { convertDateToFormatString } from "#lib/util/time.ts";
+  import N2Clock from "#lib/component/N2Clock.svelte";
+
+  export let data;
 
   const myname = "Taro Nonoyama"; //'Taro <span style="color:#ff0000">N</span>onoyama'
   const mySex = "Male";
@@ -57,44 +58,6 @@
       myAgeYear += 1;
     }
   }
-
-  const CARRER_CARD_DATA: CarrearCardProps[] = [
-    {
-      name: "dely.inc",
-      url: "https://dely.jp/",
-      startAt: new Date("2023-06-01T10:00:00"),
-      endAt: undefined,
-      reffers: [
-        {
-          name: "クラシル比較 / リードエンジニア・フロントエンドエンジニア",
-          url: "https://hikaku.kurashiru.com/",
-        },
-        {
-          name: "クラシル比較 / インタビュー",
-          url: "https://chot-inc.com/service/case/kurashiru-hikaku",
-        },
-      ],
-    },
-    {
-      name: "ACCESS Co., Ltd.",
-      url: "https://www.access-company.com/",
-      startAt: new Date("2021-04-01T10:00:00"),
-      endAt: new Date("2023-05-31T18:23:00"),
-      reffers: [
-        {
-          name: "Booklive fun / エンジニア",
-          url: "https://prtimes.jp/main/html/rd/p/000000256.000022823.html",
-        },
-      ],
-    },
-    {
-      name: "Meijo Univ",
-      url: "https://www.meijo-u.ac.jp/academics/info_eng/",
-      startAt: new Date("2015-04-01T09:00:00"),
-      endAt: new Date("2021-03-08T11:00:00"),
-      reffers: [],
-    },
-  ];
 </script>
 
 <SEO title="Introduce" />
@@ -115,7 +78,7 @@
 </section>
 
 <section class="carrers">
-  {#each CARRER_CARD_DATA as cd}
+  {#each data.careers as cd}
     <div class="carrer">
       <div class="carrer_duration">
         {#if cd.endAt}
@@ -129,13 +92,15 @@
         </div>
       </div>
       <div class="marker">
-        <div class="dot" />
-        <div class="connector" />
+        <div role="presentation" class="dot"></div>
+        <div role="presentation" class="connector"></div>
       </div>
-      <CarrerCard props={cd} />
+      <CarrerCard props={cd} ogp={data.ogp} />
     </div>
   {/each}
 </section>
+
+<N2Clock position="introduce" />
 
 <div style="padding: 50px 0" />
 

@@ -1,27 +1,18 @@
-<script context="module" lang="ts">
-  export interface CarrearCardProps {
-    name: string;
-    url: string;
-    startAt: Date;
-    endAt?: Date;
-    reffers: {
-      name: string;
-      url: string;
-    }[];
-  }
-</script>
-
 <script lang="ts">
   import OgpCard from "#lib/component/ogp/OgpCard.svelte";
 
+  import type { CarrearCardProps } from "../_data";
+  import type { GetOgp } from "#lib/server/schema.ts";
+
   export let props: CarrearCardProps;
+  export let ogp: Record<string, GetOgp | null> = {};
 </script>
 
 <div class="carrer_card">
-  <OgpCard url={props.url} />
+  <OgpCard url={props.url} data={ogp[props.url]} />
   {#each props.reffers as ref}
     <div class="carrer_detail">
-      <OgpCard url={ref.url} />
+      <OgpCard {ref} url={ref.url} data={ogp[ref.url]} />
     </div>
   {/each}
 </div>

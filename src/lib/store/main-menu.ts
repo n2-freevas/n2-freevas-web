@@ -31,12 +31,20 @@ export const mainmenus = writable<MainMenu[]>([
         submenu: []
     },
     {
-        name: 'X',
-        path: 'https://twitter.com/N2_FreeVAS',
-        img: '/img/X_icon.svg',
+        name: 'hobby',
+        path: '/hobby',
+        img: '/img/hobby_icon.svg',
+        active: true,
+        explain: '趣味で作ったツールなどの一覧です。',
+        submenu: []
+    },
+    {
+        name: 'LinkedIn',
+        path: 'https://www.linkedin.com/in/%E5%A4%AA%E9%83%8E-%E9%87%8E%E3%80%85%E5%B1%B1-05b20534a/',
+        img: '/img/linkedin-svgrepo-com.svg',
         target: "_blank",
         active: true,
-        explain: 'Xのアカウントへ遷移します。',
+        explain: 'LinkedInのアカウントへ遷移します。',
         submenu: []
     },
     {
@@ -49,14 +57,6 @@ export const mainmenus = writable<MainMenu[]>([
         submenu: []
         
     },
-    {
-        name: 'web dmg-cnt.',
-        img: '/img/pokeca/icon_white.svg',
-        path: '/pokemon-card-game-effector',
-        explain: 'ポケカのダメカンを、Webカメラ上でやっちゃうお手軽ツール。',
-        active: true,
-        submenu: []
-    },
     // {
     //     name: 'tcg sim',
     //     img: '/img/tcg-sim/card_naname.svg',
@@ -66,11 +66,39 @@ export const mainmenus = writable<MainMenu[]>([
     //     submenu: []
     // },
     {
-        name: 'bonus',
+        name: 'e.o.w',
         path: '/bonus',
         img: '/img/bonus.svg',
         active: true,
-        explain: 'CSSでつくったおもちゃなど',
+        explain: '末筆として。',
+        submenu: []
+    }
+])
+
+/* hobby配下の一覧 */
+export const hobbymenus = writable<MainMenu[]>([
+    {
+        name: 'sports movie player',
+        img: '/img/sports_movie_player_icon.svg',
+        path: '/hobby/sports-movie-player',
+        explain: 'タップとスワイプだけでスキップ・速度変更ができる動画プレーヤー。',
+        active: true,
+        submenu: []
+    },
+    {
+        name: 'web dmg-cnt.',
+        img: '/img/pokeca/icon_white.svg',
+        path: '/pokemon-card-game-effector',
+        explain: 'ポケカのダメカンを、Webカメラ上でやっちゃうお手軽ツール。',
+        active: true,
+        submenu: []
+    },
+    {
+        name: 'clock',
+        img: '/img/n2_clock/time-11.svg',
+        path: '/hobby/clock',
+        explain: 'N2-clockを眺めるだけの画面。',
+        active: true,
         submenu: []
     }
 ])

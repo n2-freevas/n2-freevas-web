@@ -4,14 +4,17 @@
 
   export let url: string;
 
-  let data: GetOgp | null = null;
+  // ビルド時に取得済みのデータ。無い場合のみクライアントで取得する
+  export let data: GetOgp | null = null;
+
+  export let ref: { name?: string; url: string } | undefined = undefined;
 
   onMount(async () => {
+    if (data) return;
     try {
       //@ts-ignore
       data = JSON.parse(await (await fetch(`/ogp?url=${url}`)).text())
         .data as GetOgp;
-      console.log(data);
     } catch {
       data = null;
     }
@@ -23,11 +26,13 @@
   {#if !!data}
     <div class="ogp_card_grids">
       <a href={data.siteUrl}>
-        <div class="title">{data.title}</div>
+        <div class="title">{ref?.name ?? data.title}</div>
         <div class="description">{data.description ?? "--"}</div>
       </a>
       <div class="thumbnail">
-        <img src={data.images[0].url} alt={data.images[0].alt} />
+        {#if data.images[0]?.url}
+          <img src={data.images[0].url} alt={data.images[0].alt ?? ""} />
+        {/if}
       </div>
     </div>
     <div class="corner_box">
