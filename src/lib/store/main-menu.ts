@@ -78,6 +78,14 @@ export const mainmenus = writable<MainMenu[]>([
 /* hobby配下の一覧 */
 export const hobbymenus = writable<MainMenu[]>([
     {
+        name: 'sports movie player',
+        img: '/img/sports_movie_player_icon.svg',
+        path: '/hobby/sports-movie-player',
+        explain: 'タップとスワイプだけでスキップ・速度変更ができる動画プレーヤー。',
+        active: true,
+        submenu: []
+    },
+    {
         name: 'web dmg-cnt.',
         img: '/img/pokeca/icon_white.svg',
         path: '/pokemon-card-game-effector',
