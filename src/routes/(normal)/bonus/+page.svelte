@@ -1,7 +1,7 @@
 <script lang="ts">
-  import PendulumLoader from "$lib/component/loader/pendulumLoader.svelte";
+  import PendulumLoader from "#lib/component/loader/pendulumLoader.svelte";
 
-  // import DotStringLoader from '$lib/component/loader/DotStringLoader.svelte'
+  // import DotStringLoader from '#lib/component/loader/DotStringLoader.svelte'
 
   $: innerWidth = 0;
 

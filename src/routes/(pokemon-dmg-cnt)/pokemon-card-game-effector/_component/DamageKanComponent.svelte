@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { DamageKan } from '$lib/model/app/PokemonCardGameEffectorStore'
+    import type { DamageKan } from '#lib/model/app/PokemonCardGameEffectorStore'
     import { createEventDispatcher } from 'svelte'
 
     export let model: DamageKan = {

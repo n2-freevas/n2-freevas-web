@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import SEO from "$lib/component/seo/index.svelte";
+  import SEO from "#lib/component/seo/index.svelte";
   import CarrerCard, {
     type CarrearCardProps,
   } from "./_components/CarrerCard.svelte";
-  import { convertDateToFormatString } from "$lib/util/time";
+  import { convertDateToFormatString } from "#lib/util/time.ts";
 
   const myname = "Taro Nonoyama"; //'Taro <span style="color:#ff0000">N</span>onoyama'
   const mySex = "Male";

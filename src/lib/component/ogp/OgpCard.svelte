@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { GetOgp } from "$lib/server/schema";
+  import type { GetOgp } from "#lib/server/schema.ts";
 
   export let url: string;
 

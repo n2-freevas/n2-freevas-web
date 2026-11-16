@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onNavigate } from "$app/navigation";
-  import { mainmenus } from "$lib/store/main-menu";
-  import HeaderMenuBox from "$lib/component/HeaderMenuBox.svelte";
-  import HambergerMenuBox from "$lib/component/HambergerMenuBox.svelte";
-  import ToastArea from "$lib/component/toast/ToastArea.svelte";
+  import { mainmenus } from "#lib/store/main-menu.ts";
+  import HeaderMenuBox from "#lib/component/HeaderMenuBox.svelte";
+  import HambergerMenuBox from "#lib/component/HambergerMenuBox.svelte";
+  import ToastArea from "#lib/component/toast/ToastArea.svelte";
 
   let sliderOpen = false;
 

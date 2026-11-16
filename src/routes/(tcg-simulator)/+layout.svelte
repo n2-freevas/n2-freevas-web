@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ToastArea from "$lib/component/toast/ToastArea.svelte";
+  import ToastArea from "#lib/component/toast/ToastArea.svelte";
   import { modeStore } from "./tcg-simulator/_components/TCGsimStore";
   import { deckShuffle } from "./tcg-simulator/_components/deckAndHand.svelte";
   import {

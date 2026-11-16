@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { PoisonKan } from '$lib/model/app/PokemonCardGameEffectorStore'
+    import type { PoisonKan } from '#lib/model/app/PokemonCardGameEffectorStore'
     export let model: PoisonKan
     let moving: boolean = false
     let animate: boolean = false

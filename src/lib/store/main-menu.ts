@@ -67,7 +67,7 @@ export const mainmenus = writable<MainMenu[]>([
     // },
     {
         name: 'bonus',
-        path: '/show',
+        path: '/bonus',
         img: '/img/bonus.svg',
         active: true,
         explain: 'CSSでつくったおもちゃなど',
