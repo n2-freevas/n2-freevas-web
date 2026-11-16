@@ -5,10 +5,10 @@
   /**
    * <sports-video-player> の本体(Webコンポーネント)。
    * https://github.com/n2-freevas/sports-movie-player-in-web の GitHub リリース
-   * (v0.1.0 の sports-video-player.js) を static/vendor に置いたもの。
+   * (v0.2.0 の sports-video-player.js) を static/vendor に置いたもの。
    * 更新するときは新しいバージョンのディレクトリを作り、このパスを差し替える。
    */
-  const SVP_SRC = "/vendor/sports-video-player/0.1.0/sports-video-player.js";
+  const SVP_SRC = "/vendor/sports-video-player/0.2.0/sports-video-player.js";
 
   let loadError = false;
 
