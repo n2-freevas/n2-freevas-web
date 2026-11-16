@@ -29,3 +29,26 @@ export function weekStartOf(date: string): string {
   const dow = new Date(`${date}T00:00:00Z`).getUTCDay();
   return addDays(date, -dow);
 }
+
+/** "YYYY-MM-DD" に月数を足す。その月にない日(1/31 の 1 か月後など)は月末にそろえる */
+export function addMonths(date: string, months: number): string {
+  const [y, m, d] = date.split("-").map(Number);
+  const target = new Date(Date.UTC(y, m - 1 + months, 1));
+  const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+  target.setUTCDate(Math.min(d, lastDay));
+  return target.toISOString().slice(0, 10);
+}
+
+/** 先の何か月ぶんを持つか */
+export const MONTHS_AHEAD = 5;
+
+/**
+ * /calender が持つ期間(日本時間の "YYYY-MM-DD"、to は含まない)。
+ * 今週の日曜日から、MONTHS_AHEAD か月後の日を含む週の土曜日まで。週の途中で切れないよう週単位にそろえる。
+ * cron(集める範囲)とページ(移動できる範囲)の両方がこれを使う。
+ */
+export function calenderRange(today: string): { from: string; to: string; lastWeek: string } {
+  const from = weekStartOf(today);
+  const lastWeek = weekStartOf(addMonths(today, MONTHS_AHEAD));
+  return { from, to: addDays(lastWeek, 7), lastWeek };
+}

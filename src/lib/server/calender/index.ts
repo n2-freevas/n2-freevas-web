@@ -8,12 +8,8 @@
 import { CALENDER_ICS_URLS, CALENDER_TENNISBEAR_TOKEN } from "$app/env/private";
 import { icsSource } from "./ics";
 import { tennisBearSource } from "./tennisbear";
-import { addDays, DAY, jstDate, jstMidnight, weekStartOf } from "./time";
+import { addDays, calenderRange, DAY, jstDate, jstMidnight } from "./time";
 import type { Busy, BusySource } from "./types";
-
-/** 見られる範囲(今週から前後何週か)。cron はこの範囲をまとめて集める */
-export const PAST_WEEKS = 4;
-export const FUTURE_WEEKS = 26;
 
 function sources(): BusySource[] {
   const list: BusySource[] = [];
@@ -49,9 +45,8 @@ export interface Snapshot {
 
 /** すべての取得元から集める。1 つも取れなかったら null(前回のスナップショットを残すため) */
 export async function buildSnapshot(now = Date.now()): Promise<Snapshot | null> {
-  const thisWeek = weekStartOf(jstDate(now));
-  const from = addDays(thisWeek, -7 * PAST_WEEKS);
-  const to = addDays(thisWeek, 7 * (FUTURE_WEEKS + 1));
+  // 今週の日曜日〜5 か月後の週の土曜日(time.ts の calenderRange)。過去の週は持たない
+  const { from, to } = calenderRange(jstDate(now));
   const range = { start: jstMidnight(from), end: jstMidnight(to) };
 
   const list = sources();

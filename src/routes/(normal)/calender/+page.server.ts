@@ -3,16 +3,15 @@
  * ページを開いても、Google・iCloud・テニスベアには問い合わせない。
  */
 import { redirect } from "@sveltejs/kit";
-import { FUTURE_WEEKS, PAST_WEEKS } from "#lib/server/calender/index.ts";
 import { loadSnapshot } from "#lib/server/calender/store.ts";
-import { addDays, jstDate, weekStartOf } from "#lib/server/calender/time.ts";
+import { addDays, calenderRange, jstDate, weekStartOf } from "#lib/server/calender/time.ts";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ url, setHeaders }) => {
   const today = jstDate(Date.now());
   const thisWeek = weekStartOf(today);
-  const min = addDays(thisWeek, -7 * PAST_WEEKS);
-  const max = addDays(thisWeek, 7 * FUTURE_WEEKS);
+  // 移動できるのは、cron が集める範囲と同じ「今週〜5 か月後の週」
+  const { from: min, lastWeek: max } = calenderRange(today);
 
   const param = url.searchParams.get("week");
   let week = thisWeek;
