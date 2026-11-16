@@ -15,12 +15,14 @@
     const [y, m, d] = date.split("-").map(Number);
     return { y, m, d, dow: new Date(Date.UTC(y, m - 1, d)).getUTCDay() };
   };
-  const fmt = (min: number) => `${Math.floor(min / 60)}:${String(min % 60).padStart(2, "0")}`;
+  const fmt = (min: number) =>
+    `${Math.floor(min / 60)}:${String(min % 60).padStart(2, "0")}`;
 
   const title = $derived.by(() => {
     const first = parse(data.days[0].date);
     const last = parse(data.days[6].date);
-    if (first.y !== last.y) return `${first.y}年${first.m}月 – ${last.y}年${last.m}月`;
+    if (first.y !== last.y)
+      return `${first.y}年${first.m}月 – ${last.y}年${last.m}月`;
     if (first.m !== last.m) return `${first.y}年 ${first.m}月 – ${last.m}月`;
     return `${first.y}年 ${first.m}月`;
   });
@@ -34,7 +36,9 @@
 
   // 現在時刻の線(日本時間)。1 分ごとに動かす
   let now = $state(Date.now());
-  const nowMinutes = $derived(Math.floor(((now + JST_OFFSET) % DAY_MS) / 60000));
+  const nowMinutes = $derived(
+    Math.floor(((now + JST_OFFSET) % DAY_MS) / 60000),
+  );
 
   let scroller: HTMLDivElement | undefined = $state();
 
@@ -47,24 +51,42 @@
   $effect(() => {
     const isThisWeek = data.week === data.thisWeek;
     if (!scroller) return;
-    const target = isThisWeek ? Math.max(0, untrack(() => nowMinutes) / 60 - 1.5) : 8;
+    const target = isThisWeek
+      ? Math.max(0, untrack(() => nowMinutes) / 60 - 1.5)
+      : 8;
     scroller.scrollTop = target * HOUR_PX;
   });
 </script>
 
-<SEO title="calender" description="Taro Nonoyama の予定の埋まり具合(内容は非公開)" />
+<SEO
+  title="calender"
+  description="Taro Nonoyama の予定の埋まり具合(内容は非公開)"
+/>
 
 <div class="calender" style:--hour="{HOUR_PX}px">
   <div class="toolbar">
-    <a class="today-btn" class:disabled={data.week === data.thisWeek} href="/calender" data-sveltekit-noscroll>今日</a>
+    <a
+      class="today-btn"
+      class:disabled={data.week === data.thisWeek}
+      href="/calender"
+      data-sveltekit-noscroll>今日</a
+    >
     <div class="nav">
       {#if data.prevWeek}
-        <a href="/calender?week={data.prevWeek}" aria-label="前の週" data-sveltekit-noscroll>‹</a>
+        <a
+          href="/calender?week={data.prevWeek}"
+          aria-label="前の週"
+          data-sveltekit-noscroll>‹</a
+        >
       {:else}
         <span class="disabled" aria-hidden="true">‹</span>
       {/if}
       {#if data.nextWeek}
-        <a href="/calender?week={data.nextWeek}" aria-label="次の週" data-sveltekit-noscroll>›</a>
+        <a
+          href="/calender?week={data.nextWeek}"
+          aria-label="次の週"
+          data-sveltekit-noscroll>›</a
+        >
       {:else}
         <span class="disabled" aria-hidden="true">›</span>
       {/if}
@@ -76,7 +98,9 @@
       {:else if data.unconfigured}
         予定の取得元が設定されていません
       {:else}
-        {data.partial ? "一部の予定を読み込めませんでした・" : "予定の内容は非公開です・"}{updatedLabel}
+        {data.partial
+          ? "一部の予定を読み込めませんでした・"
+          : "予定の内容は非公開です・"}{updatedLabel}
       {/if}
     </p>
   </div>
@@ -85,7 +109,12 @@
     <div class="gutter tz">GMT+09</div>
     {#each data.days as day}
       {@const p = parse(day.date)}
-      <div class="day-head" class:today={day.date === data.today} class:sun={p.dow === 0} class:sat={p.dow === 6}>
+      <div
+        class="day-head"
+        class:today={day.date === data.today}
+        class:sun={p.dow === 0}
+        class:sat={p.dow === 6}
+      >
         <span class="dow">{WEEKDAYS[p.dow]}</span>
         <span class="num">{p.d}</span>
       </div>
@@ -120,7 +149,8 @@
               style:height="{Math.max(((b.end - b.start) / 60) * HOUR_PX, 4)}px"
               title="予定あり {fmt(b.start)}–{fmt(b.end)}"
             >
-              {#if b.end - b.start >= 45}<span>{fmt(b.start)}–{fmt(b.end)}</span>{/if}
+              {#if b.end - b.start >= 45}<span>{fmt(b.start)}–{fmt(b.end)}</span
+                >{/if}
             </div>
           {/each}
           {#if day.date === data.today}
@@ -271,7 +301,26 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      width: 4px; /* お好みの太さに変更（例: 6px） */
+    }
+
+    /* スクロールバーの背景（レール）の色 */
+    &::-webkit-scrollbar-track {
+      background: gray;
+    }
+
+    /* スクロールバーのつまみ（動く部分）の色や角丸 */
+    &::-webkit-scrollbar-thumb {
+      background: white;
+      border-radius: 4px;
+    }
+
+    /* ホバー時のつまみの色 */
+    &::-webkit-scrollbar-thumb:hover {
+      background: #ddd;
+    }
   }
   .grid {
     position: relative;
