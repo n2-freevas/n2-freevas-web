@@ -12,13 +12,15 @@ import type { Busy } from "./types";
 
 const START_KEYS = /^(start|starts|begin)(_?(date)?_?time|_?datetime|_?at|_?date)?(_?string)?$|^(event_?)?(date_?time|datetime)$/i;
 const END_KEYS = /^(end|ends|finish)(_?(date)?_?time|_?datetime|_?at|_?date)?(_?string)?$/i;
-const CANCEL_KEYS = /^(is_?)?cancel+ed$|^deleted$|^is_?deleted$/i;
+const CANCEL_KEYS = /^(is_?)?cancel+ed$|^deleted$|^is_?deleted$|^call_?off$/i;
 /** 「11/17(火) 5:00-23:59」「19:00〜21:00」のような時間帯の表記 */
 const TIME_RANGE = /(\d{1,2}):(\d{2})\s*[-~〜～–]\s*(\d{1,2}):(\d{2})/;
 
 export interface HeuristicOptions {
   /** 終了がわからないときの長さ(ミリ秒) */
   defaultDuration?: number;
+  /** 予定のオブジェクトから、取得元での ID を取り出す(帯から元の予定を開けるようにするとき) */
+  ref?: (obj: Record<string, unknown>) => string | undefined;
 }
 
 export function extractBusy(json: unknown, opts: HeuristicOptions = {}): Busy[] {
@@ -35,7 +37,12 @@ export function extractBusy(json: unknown, opts: HeuristicOptions = {}): Busy[] 
     const busy = toBusy(obj, defaultDuration);
     if (busy !== undefined) {
       // 予定とみなしたオブジェクトの中(会場・主催者など)はもう見ない
-      if (busy) found.set(busy.kind === "timed" ? `${busy.start}-${busy.end}` : `${busy.startDate}-${busy.endDate}`, busy);
+      if (busy) {
+        const ref = opts.ref?.(obj);
+        if (ref) busy.ref = ref;
+        const time = busy.kind === "timed" ? `${busy.start}-${busy.end}` : `${busy.startDate}-${busy.endDate}`;
+        found.set(`${time}#${ref ?? ""}`, busy);
+      }
       return;
     }
     for (const child of Object.values(obj)) visit(child, depth + 1);

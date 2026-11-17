@@ -34,11 +34,20 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(week, i);
-    const day = snapshot?.days[date];
+    // version 1 のスナップショット(帯の種類を持たない)は、すべて 💻(o)として出す
+    const day = snapshot?.days[date] as
+      | { allDay?: string | true; blocks?: [number, number, string?, string[]?][] }
+      | undefined;
     return {
       date,
-      allDay: day?.allDay === true,
-      blocks: (day?.blocks ?? []).map(([start, end]) => ({ start, end })),
+      /** 終日の予定の種類(Flag を並べた文字列)。なければ null */
+      allDay: day?.allDay === true ? "o" : (day?.allDay ?? null),
+      blocks: (day?.blocks ?? []).map(([start, end, flags, refs]) => ({
+        start,
+        end,
+        flags: flags || "o",
+        refs: refs ?? [],
+      })),
     };
   });
 
