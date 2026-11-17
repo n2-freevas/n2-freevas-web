@@ -3857,24 +3857,28 @@ function Ds(e, t) {
 		direction: 0,
 		total: 0,
 		at: -Infinity
-	}, ne = /* @__PURE__ */ H(!1), E, re = 0;
+	}, ne = null, E = /* @__PURE__ */ H(!1), re, D = 0;
 	Vn(() => _.listen()), Vn(() => {
 		m.toggleAttribute("fullscreen", _.active);
 	}), Vn(() => {
 		m.hasAttribute("tabindex") || (m.tabIndex = 0);
-		let e = () => {
+		let e = (e) => {
 			document.activeElement !== m && m.focus({ preventScroll: !0 });
+			let t = e.composedPath()[0];
+			ne = t instanceof Element ? t.closest("button") : null;
+		}, t = (e) => {
+			e.relatedTarget !== m && (ne = null);
 		};
-		return m.addEventListener("keydown", ge), m.addEventListener("pointerdown", e), () => {
-			m.removeEventListener("keydown", ge), m.removeEventListener("pointerdown", e);
+		return m.addEventListener("keydown", _e), m.addEventListener("pointerdown", e), m.addEventListener("focusout", t), () => {
+			m.removeEventListener("keydown", _e), m.removeEventListener("pointerdown", e), m.removeEventListener("focusout", t);
 		};
 	});
-	let D = !1;
+	let O = !1;
 	Vn(() => {
 		let e = J(v) || J(y);
 		Fr(() => {
 			let t = document.activeElement == null || document.activeElement === document.body;
-			D && !e && t && m.focus({ preventScroll: !0 }), D = e;
+			O && !e && t && m.focus({ preventScroll: !0 }), O = e;
 		});
 	}), Vn(() => {
 		let e = Za(u() ?? null) ?? [...Va];
@@ -3882,7 +3886,7 @@ function Ds(e, t) {
 	}), Vn(() => {
 		let e = r();
 		Fr(() => {
-			e && de(() => g.loadUrl(e));
+			e && fe(() => g.loadUrl(e));
 		});
 	}), Vn(() => {
 		let e = g.paused;
@@ -3892,21 +3896,21 @@ function Ds(e, t) {
 	}), Vn(() => {
 		g.error && Fr(() => x.show());
 	}), Hi(() => {
-		x.cancel(), clearTimeout(E), clearTimeout(w.left), clearTimeout(w.right), g.release();
+		x.cancel(), clearTimeout(re), clearTimeout(w.left), clearTimeout(w.right), g.release();
 	});
-	function O(e) {
-		return de(() => g.loadFile(e));
-	}
-	function ie() {
-		g.play();
+	function ie(e) {
+		return fe(() => g.loadFile(e));
 	}
 	function ae() {
-		g.pause();
+		g.play();
 	}
 	function oe() {
+		g.pause();
+	}
+	function se() {
 		g.togglePlay();
 	}
-	function se(e) {
+	function ce(e) {
 		let t = g.skipBy(e, J(p).skipSeconds);
 		return t == null ? 0 : (h("svp-skip", {
 			direction: e,
@@ -3915,13 +3919,13 @@ function Ds(e, t) {
 			total: t
 		}), t);
 	}
-	function ce(e) {
-		g.setRate(e, "api"), xe();
-	}
 	function le(e) {
+		g.setRate(e, "api"), Se();
+	}
+	function ue(e) {
 		g.seek(e);
 	}
-	function ue() {
+	function de() {
 		return {
 			rate: g.rate,
 			currentTime: g.video?.currentTime ?? 0,
@@ -3930,58 +3934,59 @@ function Ds(e, t) {
 			video: g.video
 		};
 	}
-	function de(e) {
+	function fe(e) {
 		J(S)?.reset(), T = 0, x.show();
 		let t = e();
 		return t.catch(() => {}), t;
 	}
-	function fe() {
+	function pe() {
 		let e = ee.files?.[0];
-		ee.value = "", e && O(e);
+		ee.value = "", e && ie(e);
 	}
-	function pe(e) {
+	function me(e) {
 		e === "center" && g.source != null ? g.togglePlay() : x.toggle();
 	}
-	function me(e, t) {
+	function he(e, t) {
 		let n = g.skipBy(e, J(p).skipSeconds);
-		n != null && (T += n, ve(e, T, t), h("svp-skip", {
+		n != null && (T += n, ye(e, T, t), h("svp-skip", {
 			direction: e,
 			seconds: n,
 			rate: g.rate,
 			total: T
 		}));
 	}
-	function he(e) {
-		let t = Wa(re, e, J(p).swipeStepPx, g.rates.length, g.minRateIndex);
+	function ge(e) {
+		let t = Wa(D, e, J(p).swipeStepPx, g.rates.length, g.minRateIndex);
 		t !== g.rateIndex && g.setRateIndex(t, "swipe");
 	}
-	function ge(e) {
+	function _e(e) {
 		if (e.defaultPrevented) return;
-		let t = e.composedPath()[0];
-		if ((e.key === " " || e.key === "Enter") && t instanceof Element && t.closest("button")) return;
-		let n = ns(e);
-		if (n && !(J(y) && n.type !== "help") && (e.preventDefault(), !e.repeat || n.type !== "togglePlay" && n.type !== "help")) switch (n.type) {
+		e.key === "Tab" && (ne = null);
+		let t = e.composedPath()[0], n = t instanceof Element ? t.closest("button") : null;
+		if (n && e.key === "Enter" || n && e.key === " " && n !== ne) return;
+		let r = ns(e);
+		if (r && !(J(y) && r.type !== "help") && (e.preventDefault(), !e.repeat || r.type !== "togglePlay" && r.type !== "help")) switch (r.type) {
 			case "togglePlay":
 				g.source != null && g.togglePlay();
 				break;
 			case "skip":
-				_e(n.direction, n.scale);
+				ve(r.direction, r.scale);
 				break;
 			case "seekRatio":
 				if (!g.hasMetadata) break;
-				g.seek(g.duration * n.ratio), x.show();
+				g.seek(g.duration * r.ratio), x.show();
 				break;
 			case "frame":
 				if (!g.hasMetadata || !g.paused || !g.video) break;
-				g.seek(g.video.currentTime + n.direction * es);
+				g.seek(g.video.currentTime + r.direction * es);
 				break;
 			case "rate":
-				g.setRateIndex(g.rateIndex + n.step, "keyboard"), xe();
+				g.setRateIndex(g.rateIndex + r.step, "keyboard"), Se();
 				break;
-			case "help": J(y) ? U(y, !1) : be();
+			case "help": J(y) ? U(y, !1) : xe();
 		}
 	}
-	function _e(e, t) {
+	function ve(e, t) {
 		let n = g.skipBy(e, J(p).skipSeconds * t);
 		if (n == null) return;
 		let r = performance.now();
@@ -3989,37 +3994,37 @@ function Ds(e, t) {
 			direction: e,
 			total: (te.direction === e && r - te.at < 650 ? te.total : 0) + n,
 			at: r
-		}, ve(e, te.total, null), h("svp-skip", {
+		}, ye(e, te.total, null), h("svp-skip", {
 			direction: e,
 			seconds: n,
 			rate: g.rate,
 			total: te.total
 		});
 	}
-	function ve(e, t, n) {
+	function ye(e, t, n) {
 		let r = e < 0 ? "left" : "right", i = e < 0 ? "right" : "left";
 		J(C)[i].visible = !1;
 		let a = J(C)[r];
 		a.label = Ja(e, t), a.at = n, a.seq += 1, a.visible = !0, clearTimeout(w[r]), w[r] = setTimeout(() => J(C)[r].visible = !1, 650);
 	}
-	function ye(e) {
-		U(ne, !0), clearTimeout(E), e != null && (E = setTimeout(() => U(ne, !1), e));
-	}
-	function be() {
-		g.pause(), U(v, !1), U(y, !0);
+	function be(e) {
+		U(E, !0), clearTimeout(re), e != null && (re = setTimeout(() => U(E, !1), e));
 	}
 	function xe() {
-		ye(900);
+		g.pause(), U(v, !1), U(y, !0);
 	}
-	var Se = {
-		loadFile: O,
-		play: ie,
-		pause: ae,
-		togglePlay: oe,
-		skip: se,
-		setRate: ce,
-		setCurrentTime: le,
-		getSnapshot: ue,
+	function Se() {
+		be(900);
+	}
+	var Ce = {
+		loadFile: ie,
+		play: ae,
+		pause: oe,
+		togglePlay: se,
+		skip: ce,
+		setRate: le,
+		setCurrentTime: ue,
+		getSnapshot: de,
 		get filePicker() {
 			return n();
 		},
@@ -4080,10 +4085,10 @@ function Ds(e, t) {
 		set autohideMs(e) {
 			d(e), V();
 		}
-	}, Ce = Ts(), we = W(Ce);
-	Oa(we, (e) => g.video = e, () => g?.video);
-	var Te = G(we, 2);
-	Oa(ko(Te, {
+	}, we = Ts(), Te = W(we);
+	Oa(Te, (e) => g.video = e, () => g?.video);
+	var Ee = G(Te, 2);
+	Oa(ko(Ee, {
 		get zoneLeft() {
 			return J(p).zoneLeft;
 		},
@@ -4096,26 +4101,26 @@ function Ds(e, t) {
 		get streakMs() {
 			return J(p).streakMs;
 		},
-		onsingletap: pe,
+		onsingletap: me,
 		ondoubletap: (e, t) => {
-			T = 0, me(e === "left" ? -1 : 1, t);
+			T = 0, he(e === "left" ? -1 : 1, t);
 		},
-		onstreaktap: (e, t) => me(e === "left" ? -1 : 1, t),
+		onstreaktap: (e, t) => he(e === "left" ? -1 : 1, t),
 		onstreakend: () => T = 0,
 		onswipestart: () => {
-			re = g.rateIndex, x.hide(), ye();
+			D = g.rateIndex, x.hide(), be();
 		},
-		onswipemove: he,
-		onswipeend: () => ye(600)
+		onswipemove: ge,
+		onswipeend: () => be(600)
 	}), (e) => U(S, e, !0), () => J(S));
-	var Ee = G(Te, 2), De = W(Ee);
-	Bo(De, Ma({ side: "left" }, () => J(C).left));
-	var Oe = G(De, 2);
-	Bo(Oe, Ma({ side: "right" }, () => J(C).right));
+	var De = G(Ee, 2), Oe = W(De);
+	Bo(Oe, Ma({ side: "left" }, () => J(C).left));
 	var k = G(Oe, 2);
-	Io(k, {
+	Bo(k, Ma({ side: "right" }, () => J(C).right));
+	var ke = G(k, 2);
+	Io(ke, {
 		get visible() {
-			return J(ne);
+			return J(E);
 		},
 		get rates() {
 			return g.rates;
@@ -4127,17 +4132,17 @@ function Ds(e, t) {
 			return g.minRateIndex;
 		}
 	});
-	var ke = G(k, 2);
-	let A;
-	var j = kn(ke, !0), Ae = G(ke, 2), je = (e) => {
+	var A = G(ke, 2);
+	let j;
+	var Ae = kn(A, !0), je = G(A, 2), Me = (e) => {
 		var t = ws(), n = kn(t, !0);
 		Jn(() => Ei(n, g.errorMessage)), Z(e, t);
 	};
-	Ui(Ae, (e) => {
-		g.errorMessage && e(je);
-	}), M(Ee);
-	var Me = G(Ee, 2);
-	vo(Me, {
+	Ui(je, (e) => {
+		g.errorMessage && e(Me);
+	}), M(De);
+	var Ne = G(De, 2);
+	vo(Ne, {
 		get player() {
 			return g;
 		},
@@ -4152,10 +4157,10 @@ function Ds(e, t) {
 		},
 		onpickfile: () => ee.click(),
 		onselectrate: (e) => {
-			g.setRateIndex(e, "menu"), xe();
+			g.setRateIndex(e, "menu"), Se();
 		},
 		ontogglefullscreen: () => _.toggle(),
-		onhelp: be,
+		onhelp: xe,
 		onactivity: () => x.restart(),
 		get menuOpen() {
 			return J(v);
@@ -4170,7 +4175,7 @@ function Ds(e, t) {
 			U(b, e, !0);
 		}
 	});
-	var Ne = G(Me, 2), Pe = (e) => {
+	var Pe = G(Ne, 2), Fe = (e) => {
 		So(e, {
 			get filePicker() {
 				return n();
@@ -4178,10 +4183,10 @@ function Ds(e, t) {
 			onpickfile: () => ee.click()
 		});
 	};
-	Ui(Ne, (e) => {
-		g.source ?? e(Pe);
+	Ui(Pe, (e) => {
+		g.source ?? e(Fe);
 	});
-	var Fe = G(Ne, 2), Ie = (e) => {
+	var Ie = G(Pe, 2), Le = (e) => {
 		{
 			let t = /* @__PURE__ */ F(() => J(p).skipSeconds * ts);
 			Mo(e, {
@@ -4201,13 +4206,13 @@ function Ds(e, t) {
 			});
 		}
 	};
-	Ui(Fe, (e) => {
-		J(y) && e(Ie);
+	Ui(Ie, (e) => {
+		J(y) && e(Le);
 	});
-	var Le = G(Fe, 2);
-	return Oa(Le, (e) => ee = e, () => ee), M(Ce), Jn((e) => {
-		A = ua(ke, 1, "rate-badge svelte-1kahku6", null, A, { show: !x.visible && g.rate !== 1 }), Ei(j, e);
-	}, [() => Ya(g.rate)]), Br("loadedmetadata", we, () => g.onLoadedMetadata()), Br("durationchange", we, () => g.onDurationChange()), Br("timeupdate", we, () => g.onTimeUpdate()), Br("progress", we, () => g.onProgress()), Br("seeked", we, () => g.onProgress()), Br("play", we, () => g.onPlayStateChange()), Br("pause", we, () => g.onPlayStateChange()), Br("ended", we, () => x.show()), Br("error", we, () => g.onError()), Y("change", Le, fe), Z(e, Ce), Qe(Se);
+	var Re = G(Ie, 2);
+	return Oa(Re, (e) => ee = e, () => ee), M(we), Jn((e) => {
+		j = ua(A, 1, "rate-badge svelte-1kahku6", null, j, { show: !x.visible && g.rate !== 1 }), Ei(Ae, e);
+	}, [() => Ya(g.rate)]), Br("loadedmetadata", Te, () => g.onLoadedMetadata()), Br("durationchange", Te, () => g.onDurationChange()), Br("timeupdate", Te, () => g.onTimeUpdate()), Br("progress", Te, () => g.onProgress()), Br("seeked", Te, () => g.onProgress()), Br("play", Te, () => g.onPlayStateChange()), Br("pause", Te, () => g.onPlayStateChange()), Br("ended", Te, () => x.show()), Br("error", Te, () => g.onError()), Y("change", Re, pe), Z(e, we), Qe(Ce);
 }
 Vr(["change"]), customElements.define("sports-video-player", Ba(Ds, {
 	filePicker: {

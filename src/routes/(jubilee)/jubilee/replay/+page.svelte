@@ -15,7 +15,7 @@
    * https://github.com/n2-freevas/sports-movie-player-in-web の GitHub リリースを static/vendor に置いたもの。
    * hobby/sports-movie-player と同じものを使う。
    */
-  const SVP_SRC = "/vendor/sports-video-player/0.2.0/sports-video-player.js";
+  const SVP_SRC = "/vendor/sports-video-player/0.2.1/sports-video-player.js";
 
   let loadError = false;
 
