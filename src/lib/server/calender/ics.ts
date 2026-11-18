@@ -5,7 +5,7 @@
  */
 import ICAL from "ical.js";
 import { jstDate, jstToEpoch } from "./time";
-import type { Busy, BusySource, Range } from "./types";
+import type { Busy, BusySource, Origin, Range } from "./types";
 
 /** 1 つの繰り返し予定から展開する回数の上限(壊れた RRULE で止まらないようにする) */
 const MAX_OCCURRENCES = 20000;
@@ -13,12 +13,15 @@ const MAX_OCCURRENCES = 20000;
 export function icsSource(url: string, index: number): BusySource {
   // webcal:// は iCloud などの共有リンクの形。中身は https で取れる
   const httpUrl = url.replace(/^webcals?:\/\//i, "https://");
+  // Google カレンダーの ICS は calendar.google.com から配られる。それ以外(iCloud など)は "other"
+  const origin: Origin = /^https:\/\/([a-z0-9-]+\.)*google\.com\//i.test(httpUrl) ? "google" : "other";
   return {
     name: `ics#${index + 1}`,
+    origin,
     async fetch(range) {
       const res = await fetch(httpUrl, { headers: { accept: "text/calendar" } });
       if (!res.ok) throw new Error(`ICS の取得に失敗しました(${res.status})`);
-      return parseIcs(await res.text(), range);
+      return parseIcs(await res.text(), range).map((b) => ({ ...b, origin }));
     },
   };
 }

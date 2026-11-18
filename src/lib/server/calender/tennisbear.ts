@@ -20,6 +20,7 @@ export function tennisBearSource(token: string): BusySource {
   };
   return {
     name: "tennisbear",
+    origin: "tennisbear",
     async fetch(range) {
       // 過去の週を見るときだけ、終わったイベント(新しい順に 20 件)も読む
       const wantPast = range.start < Date.now();
@@ -27,7 +28,10 @@ export function tennisBearSource(token: string): BusySource {
         get(FUTURE_EVENTS),
         wantPast ? get(`${PAST_EVENTS}?limit=20&offset=0`).catch(() => []) : [],
       ]);
-      return extractBusy([future, past]);
+      // イベントの ID は帯から OGP を引くのに使う(https://www.tennisbear.net/event/<id>/info)
+      const ref = (obj: Record<string, unknown>) =>
+        typeof obj.id === "number" && Number.isSafeInteger(obj.id) ? String(obj.id) : undefined;
+      return extractBusy([future, past], { ref }).map((b) => ({ ...b, origin: "tennisbear" as const }));
     },
   };
 }
