@@ -2,6 +2,7 @@
  * cron が毎朝作るスナップショット(Vercel Blob)から 1 週間分を切り出して SSR する。
  * ページを開いても、Google・iCloud・テニスベアには問い合わせない。
  */
+import holidayJp from "@holiday-jp/holiday_jp";
 import { redirect } from "@sveltejs/kit";
 import { FLAG_ORDER } from "#lib/server/calender/index.ts";
 import { loadSnapshot } from "#lib/server/calender/store.ts";
@@ -43,14 +44,15 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
       date,
       /** 終日の予定の種類(Flag を並べた文字列)。なければ null */
       allDay: day?.allDay === true ? "o" : (day?.allDay ?? null),
-      blocks: snapToSlots(
-        (day?.blocks ?? []).map(([start, end, flags, refs]) => ({
+      blocks: snapToSlots([
+        ...(day?.blocks ?? []).map(([start, end, flags, refs]) => ({
           start,
           end,
           flags: flags || "o",
           refs: refs ?? [],
         })),
-      ),
+        ...makersSchedule(date),
+      ]),
     };
   });
 
@@ -68,6 +70,19 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
     unconfigured: snapshot?.unconfigured ?? false,
   };
 };
+
+/**
+ * Maker's schedule：祝日以外の月・水・金の 9:00〜13:00 は、仕事(w)の時間として固定で入れる。
+ * スナップショットには入れず、ここで毎回作る。ほかの予定と重なったら snapToSlots でまとめる。
+ */
+const MAKERS_DAYS = [1, 3, 5];
+const MAKERS_TIME = { start: 9 * 60, end: 13 * 60 };
+
+function makersSchedule(date: string): Block[] {
+  const dow = new Date(`${date}T00:00:00Z`).getUTCDay();
+  if (!MAKERS_DAYS.includes(dow) || holidayJp.isHoliday(date)) return [];
+  return [{ ...MAKERS_TIME, flags: "w", refs: [] }];
+}
 
 /** 帯の粒度(分)。cron 側でもそろえているが、古いスナップショット(version 1)もここで 30 分単位にする */
 const SLOT = 30;
