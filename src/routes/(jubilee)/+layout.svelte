@@ -7,16 +7,11 @@
   下へスクロールすると低く・膨らみも浅くなって控えめになり、最上部に戻ると元の大きさに戻る。
 -->
 <script lang="ts">
-  import { page } from "$app/state";
   import type { LayoutProps } from "./$types";
+  import JubileeAccount from "./_components/JubileeAccount.svelte";
   import JubileeFooter from "./_components/JubileeFooter.svelte";
 
   let { children, data }: LayoutProps = $props();
-
-  /** ログイン中で、認証用のページ以外ならログアウトを出す */
-  const showLogout = $derived(
-    !!data.email && !page.url.pathname.startsWith("/jubilee/auth"),
-  );
 
   /** このスクロール量を超えたら控えめにする(最上部付近では元の大きさ) */
   const COMPACT_AFTER_PX = 8;
@@ -32,11 +27,7 @@
     <a href="/jubilee" aria-label="jubilee のトップへ">
       <img src="/jubilee/logo_b.svg" alt="jubilee" />
     </a>
-    {#if showLogout}
-      <form class="logout" method="POST" action="/jubilee/auth/logout">
-        <button type="submit" title={data.email}>ログアウト</button>
-      </form>
-    {/if}
+    <JubileeAccount email={data.email} member={data.member} authSkipped={data.authSkipped} />
   </header>
   <main>
     {@render children()}
@@ -113,21 +104,6 @@
       img {
         height: var(--header-compact-logo);
       }
-    }
-  }
-
-  .logout {
-    position: absolute;
-    top: calc(env(safe-area-inset-top, 0px) + 12px);
-    right: 16px;
-    button {
-      padding: 4px 10px;
-      border: solid 1px #ccc;
-      border-radius: 999px;
-      background: white;
-      color: #555;
-      font-size: 12px;
-      cursor: pointer;
     }
   }
 
