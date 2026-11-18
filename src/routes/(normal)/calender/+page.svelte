@@ -18,13 +18,16 @@
   const fmt = (min: number) =>
     `${Math.floor(min / 60)}:${String(min % 60).padStart(2, "0")}`;
 
-  /** 帯の種類(スナップショットの Flag)→ アイコン */
-  const ICONS: Record<string, { icon: string; label: string }> = {
-    t: { icon: "🏏", label: "運動" },
-    w: { icon: "🧳", label: "仕事" },
-    h: { icon: "🏕️", label: "プライベート" },
-    o: { icon: "💻", label: "その他" },
-  };
+  /** 帯の種類(スナップショットの Flag)→ アイコンと帯の色(どれも黄色系) */
+  const ICONS: Record<string, { icon: string; label: string; color: string }> =
+    {
+      t: { icon: "🏏", label: "運動", color: "#ddd23a" },
+      w: { icon: "🧳", label: "仕事", color: "#ffbd08" },
+      h: { icon: "🏕️", label: "プライベート", color: "#ffd84a" },
+      o: { icon: "💻", label: "その他", color: "#ffa31a" },
+    };
+  /** 帯の色。種類が混ざった帯は先頭(FLAG_ORDER で最優先)の種類の色にする */
+  const colorOf = (flags: string) => (ICONS[flags[0]] ?? ICONS.o).color;
   /** 凡例の並び順 */
   const LEGEND = ["w", "h", "t", "o"].map((f) => ICONS[f]);
   const iconsOf = (flags: string) =>
@@ -175,7 +178,11 @@
     </div>
     <h1>{title}</h1>
     <ul class="legend" aria-label="凡例">
-      {#each LEGEND as l}<li><span aria-hidden="true">{l.icon}</span>{l.label}</li>{/each}
+      {#each LEGEND as l}<li>
+          <i class="swatch" style:background={l.color} aria-hidden="true"></i><span
+            aria-hidden="true">{l.icon}</span
+          >{l.label}
+        </li>{/each}
     </ul>
     <p class="note">
       {#if data.missing}
@@ -212,7 +219,11 @@
       {#each data.days as day}
         <div class="allday-cell">
           {#if day.allDay}
-            <div class="band" title="{labelOf(day.allDay)}(終日)">
+            <div
+              class="band"
+              style:background={colorOf(day.allDay)}
+              title="{labelOf(day.allDay)}(終日)"
+            >
               {#each iconsOf(day.allDay) as i}<span class="icon">{i.icon}</span
                 >{/each}
             </div>
@@ -239,6 +250,7 @@
                 type="button"
                 class="band clickable"
                 class:short={b.end - b.start < 60}
+                style:background={colorOf(b.flags)}
                 style:top="{(b.start / 60) * HOUR_PX}px"
                 style:height="{((b.end - b.start) / 60) * HOUR_PX}px"
                 title={label}
@@ -251,6 +263,7 @@
               <div
                 class="band"
                 class:short={b.end - b.start < 60}
+                style:background={colorOf(b.flags)}
                 style:top="{(b.start / 60) * HOUR_PX}px"
                 style:height="{((b.end - b.start) / 60) * HOUR_PX}px"
                 title={label}
@@ -366,6 +379,12 @@
       }
       span {
         font-size: 14px;
+      }
+      .swatch {
+        width: 14px;
+        height: 10px;
+        border-radius: 3px;
+        opacity: 0.85;
       }
     }
     .note {
