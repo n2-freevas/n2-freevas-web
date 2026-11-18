@@ -20,11 +20,13 @@
 
   /** 帯の種類(スナップショットの Flag)→ アイコン */
   const ICONS: Record<string, { icon: string; label: string }> = {
-    t: { icon: "🏏", label: "テニスベアのイベント" },
+    t: { icon: "🏏", label: "運動" },
     w: { icon: "🧳", label: "仕事" },
-    h: { icon: "🏕️", label: "休日の予定" },
-    o: { icon: "💻", label: "予定" },
+    h: { icon: "🏕️", label: "プライベート" },
+    o: { icon: "💻", label: "その他" },
   };
+  /** 凡例の並び順 */
+  const LEGEND = ["w", "h", "t", "o"].map((f) => ICONS[f]);
   const iconsOf = (flags: string) =>
     [...flags].map((f) => ICONS[f] ?? ICONS.o);
   const labelOf = (flags: string) =>
@@ -172,6 +174,9 @@
       {/if}
     </div>
     <h1>{title}</h1>
+    <ul class="legend" aria-label="凡例">
+      {#each LEGEND as l}<li><span aria-hidden="true">{l.icon}</span>{l.label}</li>{/each}
+    </ul>
     <p class="note">
       {#if data.missing}
         この週の予定はまだ集計されていません
@@ -344,6 +349,24 @@
     h1 {
       font-size: 20px;
       font-weight: normal;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0;
+      padding: 0;
+      color: var(--muted);
+      font-size: 12px;
+      gap: 4px 12px;
+      list-style: none;
+      li {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      span {
+        font-size: 14px;
+      }
     }
     .note {
       margin-left: auto;
