@@ -1,10 +1,20 @@
+/// <reference types="vitest/config" />
 import adapter from '@sveltejs/adapter-auto';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
-import { markdown } from './vite-plugins/markdown';
+import { markdown } from './vite-plugins/markdown.ts';
 
 export default defineConfig({
+	// in-source testing: ソースの中の `if (import.meta.vitest) { ... }` をテストとして動かす。
+	// 本番ビルドでは import.meta.vitest を undefined に置き換え、テストのコードごと消す
+	define: {
+		'import.meta.vitest': 'undefined'
+	},
+	test: {
+		includeSource: ['src/**/*.ts'],
+		exclude: ['**/node_modules/**', '**/*.d.ts']
+	},
 	plugins: [
 		// .md をビルド時に HTML へ変換する(サイト共通。vite-plugins/markdown.ts)
 		markdown(),

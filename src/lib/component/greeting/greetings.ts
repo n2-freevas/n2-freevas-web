@@ -94,3 +94,107 @@ export function pickGreeting(
   if (candidates.length === 0) return null;
   return candidates[Math.floor(random() * candidates.length)];
 }
+
+// ───────────── テスト(in-source testing。npm test で動き、本番ビルドでは消える) ─────────────
+
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest;
+
+  const ids = (query: string) => greetingCandidates(new URLSearchParams(query)).map((g) => g.id);
+  /** パラメータ無しのときの候補(requestOnly でないもの) */
+  const defaults = GREETINGS.filter((g) => !g.requestOnly).map((g) => g.id);
+
+  describe("あいさつの一覧", () => {
+    it("パラメータ名は g", () => {
+      expect(GREETING_PARAM).toBe("g");
+    });
+
+    it("id はすべて英数小文字 2 文字で、重ならない", () => {
+      for (const { id } of GREETINGS) expect(id).toMatch(/^[a-z0-9]{2}$/);
+      expect(new Set(GREETINGS.map((g) => g.id)).size).toBe(GREETINGS.length);
+    });
+
+    it("決まっている id: pf(profile) / wc(welcome) / jf(jubilee の創設者)", () => {
+      expect(GREETINGS.map((g) => g.id)).toEqual(expect.arrayContaining(["pf", "wc", "jf"]));
+    });
+
+    it("jf はパラメータで指定されたときだけ出る", () => {
+      expect(GREETINGS.find((g) => g.id === "jf")?.requestOnly).toBe(true);
+      expect(defaults).not.toContain("jf");
+    });
+  });
+
+  describe("greetingCandidates(?g= の読み方)", () => {
+    it("パラメータが無いときは、requestOnly でないものすべて", () => {
+      expect(ids("")).toEqual(defaults);
+      expect(defaults).toEqual(expect.arrayContaining(["pf", "wc"]));
+    });
+
+    it("1 つ指定すると、その id だけ", () => {
+      expect(ids("g=jf")).toEqual(["jf"]);
+      expect(ids("g=wc")).toEqual(["wc"]);
+    });
+
+    it("複数指定は区切らずに 2 文字ずつ並べる", () => {
+      expect(ids("g=pfwc").sort()).toEqual(["pf", "wc"]);
+      expect(ids("g=jfwc").sort()).toEqual(["jf", "wc"]);
+    });
+
+    it("大文字は小文字として読む", () => {
+      expect(ids("g=JF")).toEqual(["jf"]);
+    });
+
+    it("2 文字に満たない端数は捨てる", () => {
+      expect(ids("g=jfw")).toEqual(["jf"]);
+    });
+
+    it("知らない id・空・形の合わない値は、パラメータ無しと同じ", () => {
+      for (const q of ["g=zz", "g=", "g=j", "g=--", "g=j%20"]) expect(ids(q)).toEqual(defaults);
+    });
+
+    it("区切り文字は使わない(カンマ区切りは 2 文字ずつの読みとしてずれる)", () => {
+      expect(ids("g=pf,wc")).toEqual(["pf"]); // "pf" ",w" "c" → pf だけ
+    });
+
+    it("g 以外の名前(旧形式の greet など)は読まない", () => {
+      expect(ids("greet=jf")).toEqual(defaults);
+    });
+  });
+
+  describe("pickGreeting", () => {
+    it("候補の中から random に応じて 1 つ選ぶ", () => {
+      const params = new URLSearchParams("g=pfwc");
+      const first = pickGreeting(params, () => 0)?.id;
+      const last = pickGreeting(params, () => 0.999)?.id;
+      expect([first, last].sort()).toEqual(["pf", "wc"]);
+    });
+
+    it("パラメータが無いとき jf は選ばれない", () => {
+      for (let r = 0; r < 1; r += 0.05) {
+        expect(pickGreeting(new URLSearchParams(""), () => r)?.id).not.toBe("jf");
+      }
+    });
+
+    it("候補が無ければ null", () => {
+      expect(pickGreeting(new URLSearchParams(""), Math.random, [])).toBeNull();
+    });
+  });
+
+  describe("greetingHref", () => {
+    it("?g= に id を区切らずに並べる", () => {
+      expect(greetingHref("/", "jf")).toBe("/?g=jf");
+      expect(greetingHref("/", "pf", "wc")).toBe("/?g=pfwc");
+    });
+
+    it("ルールに合わない id はエラーにする", () => {
+      expect(() => greetingHref("/", "founder")).toThrow();
+      expect(() => greetingHref("/", "JF")).toThrow();
+      expect(() => greetingHref("/", "j")).toThrow();
+    });
+
+    it("作った URL を読むと、同じ id になる", () => {
+      const url = new URL(greetingHref("/", "pf", "jf"), "https://example.com");
+      expect(ids(url.search.slice(1)).sort()).toEqual(["jf", "pf"]);
+    });
+  });
+}
