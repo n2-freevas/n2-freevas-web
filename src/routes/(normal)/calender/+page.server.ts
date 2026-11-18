@@ -3,6 +3,7 @@
  * ページを開いても、Google・iCloud・テニスベアには問い合わせない。
  */
 import { redirect } from "@sveltejs/kit";
+import { FLAG_ORDER } from "#lib/server/calender/index.ts";
 import { loadSnapshot } from "#lib/server/calender/store.ts";
 import { addDays, calenderRange, jstDate, weekStartOf } from "#lib/server/calender/time.ts";
 import type { PageServerLoad } from "./$types";
@@ -42,12 +43,14 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
       date,
       /** 終日の予定の種類(Flag を並べた文字列)。なければ null */
       allDay: day?.allDay === true ? "o" : (day?.allDay ?? null),
-      blocks: (day?.blocks ?? []).map(([start, end, flags, refs]) => ({
-        start,
-        end,
-        flags: flags || "o",
-        refs: refs ?? [],
-      })),
+      blocks: snapToSlots(
+        (day?.blocks ?? []).map(([start, end, flags, refs]) => ({
+          start,
+          end,
+          flags: flags || "o",
+          refs: refs ?? [],
+        })),
+      ),
     };
   });
 
@@ -65,3 +68,29 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
     unconfigured: snapshot?.unconfigured ?? false,
   };
 };
+
+/** 帯の粒度(分)。cron 側でもそろえているが、古いスナップショット(version 1)もここで 30 分単位にする */
+const SLOT = 30;
+
+type Block = { start: number; end: number; flags: string; refs: string[] };
+
+/** 帯を 30 分単位に広げ(14:00〜14:15 → 14:00〜14:30)、広げて重なった・接した帯はまとめる */
+function snapToSlots(blocks: Block[]): Block[] {
+  const out: Block[] = [];
+  const snapped = blocks
+    .map((b) => ({
+      ...b,
+      start: Math.floor(b.start / SLOT) * SLOT,
+      end: Math.min(Math.ceil(b.end / SLOT) * SLOT, 1440),
+    }))
+    .sort((a, b) => a.start - b.start);
+  for (const b of snapped) {
+    const last = out.at(-1);
+    if (last && b.start <= last.end) {
+      last.end = Math.max(last.end, b.end);
+      last.flags = FLAG_ORDER.filter((f) => last.flags.includes(f) || b.flags.includes(f)).join("");
+      last.refs = [...new Set([...last.refs, ...b.refs])];
+    } else out.push({ ...b });
+  }
+  return out;
+}
