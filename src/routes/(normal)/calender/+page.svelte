@@ -30,6 +30,24 @@
   const colorOf = (flags: string) => (ICONS[flags[0]] ?? ICONS.o).color;
   /** 凡例の並び順 */
   const LEGEND = ["w", "h", "t", "o"].map((f) => ICONS[f]);
+  /**
+   * 重なった帯の重ね順(z-index)。終了が遅い帯ほど上に描く。
+   * ただし、ほかの帯にすっぽり入る帯は、その帯より上に出して隠れないようにする。
+   */
+  const stackOf = (blocks: { start: number; end: number }[]) => {
+    const depth = blocks.map(
+      (b, i) =>
+        blocks.filter(
+          (o, j) => j !== i && o.start <= b.start && b.end <= o.end && (o.start !== b.start || o.end !== b.end || j < i),
+        ).length,
+    );
+    const order = blocks
+      .map((b, i) => i)
+      .sort((i, j) => depth[i] - depth[j] || blocks[i].end - blocks[j].end || blocks[i].start - blocks[j].start);
+    const z: number[] = [];
+    order.forEach((i, rank) => (z[i] = rank + 1));
+    return z;
+  };
   const iconsOf = (flags: string) =>
     [...flags].map((f) => ICONS[f] ?? ICONS.o);
   const labelOf = (flags: string) =>
@@ -241,9 +259,10 @@
         {/each}
       </div>
       {#each data.days as day}
+        {@const z = stackOf(day.blocks)}
         <div class="col" class:today={day.date === data.today}>
           {#each HOURS as _}<div class="slot"></div>{/each}
-          {#each day.blocks as b}
+          {#each day.blocks as b, i}
             {@const label = `${labelOf(b.flags)} ${fmt(b.start)}–${fmt(b.end)}`}
             {#if b.refs.length}
               <button
@@ -251,6 +270,7 @@
                 class="band clickable"
                 class:short={b.end - b.start < 60}
                 style:background={colorOf(b.flags)}
+                style:z-index={z[i]}
                 style:top="{(b.start / 60) * HOUR_PX}px"
                 style:height="{((b.end - b.start) / 60) * HOUR_PX}px"
                 title={label}
@@ -264,6 +284,7 @@
                 class="band"
                 class:short={b.end - b.start < 60}
                 style:background={colorOf(b.flags)}
+                style:z-index={z[i]}
                 style:top="{(b.start / 60) * HOUR_PX}px"
                 style:height="{((b.end - b.start) / 60) * HOUR_PX}px"
                 title={label}
@@ -559,6 +580,8 @@
       border: none;
       border-radius: 4px;
       background: var(--band);
+      // 重なった帯の境目が見えるよう、黒い縁を付ける
+      box-shadow: 0 0 0 1px black;
       color: black;
       font: inherit;
       font-size: 11px;
@@ -592,7 +615,7 @@
     }
     .now {
       position: absolute;
-      z-index: 1;
+      z-index: 100;
       right: 0;
       left: -1px;
       height: 2px;

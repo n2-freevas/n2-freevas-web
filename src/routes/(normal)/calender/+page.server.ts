@@ -4,7 +4,6 @@
  */
 import holidayJp from "@holiday-jp/holiday_jp";
 import { redirect } from "@sveltejs/kit";
-import { FLAG_ORDER } from "#lib/server/calender/index.ts";
 import { loadSnapshot } from "#lib/server/calender/store.ts";
 import { addDays, calenderRange, jstDate, weekStartOf } from "#lib/server/calender/time.ts";
 import type { PageServerLoad } from "./$types";
@@ -89,9 +88,13 @@ const SLOT = 30;
 
 type Block = { start: number; end: number; flags: string; refs: string[] };
 
-/** 帯を 30 分単位に広げ(14:00〜14:15 → 14:00〜14:30)、広げて重なった・接した帯はまとめる */
+/**
+ * 帯を 30 分単位に広げ(14:00〜14:15 → 14:00〜14:30)、広げて重なった・接した帯は、同じ種類どうしだけまとめる。
+ * 種類が違う帯は別々のまま返し、ページ側で重ねて描く。
+ */
 function snapToSlots(blocks: Block[]): Block[] {
   const out: Block[] = [];
+  const open = new Map<string, Block>();
   const snapped = blocks
     .map((b) => ({
       ...b,
@@ -100,12 +103,15 @@ function snapToSlots(blocks: Block[]): Block[] {
     }))
     .sort((a, b) => a.start - b.start);
   for (const b of snapped) {
-    const last = out.at(-1);
+    const last = open.get(b.flags);
     if (last && b.start <= last.end) {
       last.end = Math.max(last.end, b.end);
-      last.flags = FLAG_ORDER.filter((f) => last.flags.includes(f) || b.flags.includes(f)).join("");
       last.refs = [...new Set([...last.refs, ...b.refs])];
-    } else out.push({ ...b });
+    } else {
+      const block = { ...b };
+      out.push(block);
+      open.set(b.flags, block);
+    }
   }
   return out;
 }

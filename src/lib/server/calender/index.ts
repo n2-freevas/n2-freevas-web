@@ -149,21 +149,23 @@ function joinFlags(flags: Iterable<string>): string {
   return FLAG_ORDER.filter((f) => set.has(f)).join("");
 }
 
-/** 重なる・接する時間帯をまとめる。まとめた帯には、もとの帯の Flag と ID をすべて持たせる */
+/**
+ * 同じ種類どうしで、重なる・接する時間帯をまとめる。まとめた帯には、もとの帯の ID をすべて持たせる。
+ * 種類が違う帯はまとめず、別々の帯として残す(ページ側で重ねて描く)。
+ */
 function merge(blocks: { start: number; end: number; flag: Flag; ref?: string }[]): SnapshotBlock[] {
   const sorted = blocks.filter((b) => b.end > b.start).sort((a, b) => a.start - b.start);
-  const out: { start: number; end: number; flags: Set<Flag>; refs: Set<string> }[] = [];
+  const out: { start: number; end: number; flag: Flag; refs: Set<string> }[] = [];
+  const open = new Map<Flag, (typeof out)[number]>();
   for (const b of sorted) {
-    let last = out.at(-1);
+    let last = open.get(b.flag);
     if (!last || b.start > last.end) {
-      last = { start: b.start, end: b.end, flags: new Set(), refs: new Set() };
+      last = { start: b.start, end: b.end, flag: b.flag, refs: new Set() };
       out.push(last);
+      open.set(b.flag, last);
     }
     last.end = Math.max(last.end, b.end);
-    last.flags.add(b.flag);
     if (b.ref) last.refs.add(b.ref);
   }
-  return out.map(({ start, end, flags, refs }) =>
-    refs.size ? [start, end, joinFlags(flags), [...refs]] : [start, end, joinFlags(flags)],
-  );
+  return out.map(({ start, end, flag, refs }) => (refs.size ? [start, end, flag, [...refs]] : [start, end, flag]));
 }
