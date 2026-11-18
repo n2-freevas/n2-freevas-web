@@ -2,7 +2,8 @@
  * jubilee 配下のアクセス確認。ページを開くたび(ページ移動のたびも)に行う。
  *   ログインしていない → Google ログインへ
  *   許可リストにない → 利用できない旨のページへ
- * 認証用のページ(/jubilee/auth/...)とプライバシーポリシーはそのまま通す。
+ * 認証用のページ(/jubilee/auth/...)と、公開ページ(プライバシーポリシー・参加のルールなど)はそのまま通す。
+ * 公開ページの一覧は #lib/server/jubilee/auth.ts の PUBLIC_PAGES。
  */
 import { redirect } from "@sveltejs/kit";
 import { authSkipped, isAllowed, isPublicPath, readSessionEmail } from "#lib/server/jubilee/auth.ts";

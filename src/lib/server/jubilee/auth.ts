@@ -43,9 +43,13 @@ export function googleClient(origin: string): GoogleClient | null {
   };
 }
 
-/** ログインなしで見られるページ(認証用のページと、プライバシーポリシー) */
+/** ログインなしで見られるページ(認証用のページ以外)。ここに足せば公開になる */
+const PUBLIC_PAGES = new Set(["/jubilee/privacy", "/jubilee/rules"]);
+
+/** ログインなしで見られるページか(認証用のページと PUBLIC_PAGES) */
 export function isPublicPath(path: string): boolean {
-  return path.startsWith("/jubilee/auth") || path === "/jubilee/privacy";
+  const normalized = path.length > 1 ? path.replace(/\/+$/, "") : path;
+  return normalized.startsWith("/jubilee/auth") || PUBLIC_PAGES.has(normalized);
 }
 
 // ───────────── ログイン状態 ─────────────

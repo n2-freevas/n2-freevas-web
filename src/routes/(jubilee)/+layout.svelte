@@ -9,6 +9,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import type { LayoutProps } from "./$types";
+  import JubileeFooter from "./_components/JubileeFooter.svelte";
 
   let { children, data }: LayoutProps = $props();
 
@@ -40,9 +41,7 @@
   <main>
     {@render children()}
   </main>
-  <footer>
-    <a href="/jubilee/privacy">プライバシーポリシー</a>
-  </footer>
+  <JubileeFooter />
 </div>
 
 <style lang="scss">
@@ -129,16 +128,6 @@
       color: #555;
       font-size: 12px;
       cursor: pointer;
-    }
-  }
-
-  footer {
-    padding: 24px 16px calc(24px + env(safe-area-inset-bottom, 0px));
-    text-align: center;
-    a {
-      color: #666;
-      font-size: 12px;
-      text-underline-offset: 3px;
     }
   }
 

@@ -2,9 +2,12 @@ import adapter from '@sveltejs/adapter-auto';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
+import { markdown } from './vite-plugins/markdown';
 
 export default defineConfig({
 	plugins: [
+		// .md をビルド時に HTML へ変換する(サイト共通。vite-plugins/markdown.ts)
+		markdown(),
 		// SvelteKit 3 以降、svelte.config.js は廃止され、設定は sveltekit() に直接渡す
 		sveltekit({
 			preprocess: vitePreprocess(),

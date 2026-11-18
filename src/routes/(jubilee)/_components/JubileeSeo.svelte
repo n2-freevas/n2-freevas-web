@@ -7,10 +7,14 @@
   import { MetaTags } from "svelte-meta-tags";
   import { page } from "$app/state";
 
-  const SITE_NAME = "jubilee";
-  const DEFAULT_DESCRIPTION = "試合の動画を振り返るためのサービス。";
+  const SITE_NAME = "Jubilee";
+  const DEFAULT_DESCRIPTION =
+    "ピックルボールサークル「ジュビリー」のポータルサイトです。";
 
-  let { title, description = DEFAULT_DESCRIPTION }: { title?: string; description?: string } = $props();
+  let {
+    title,
+    description = DEFAULT_DESCRIPTION,
+  }: { title?: string; description?: string } = $props();
 
   /** トップは「jubilee」、各ページは「replay / jubilee」 */
   const pageTitle = $derived(title ? `${title} / ${SITE_NAME}` : SITE_NAME);
