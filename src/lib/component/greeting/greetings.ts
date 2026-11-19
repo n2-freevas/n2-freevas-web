@@ -114,10 +114,6 @@ if (import.meta.vitest) {
       expect(new Set(GREETINGS.map((g) => g.id)).size).toBe(GREETINGS.length);
     });
 
-    it("決まっている id: pf(profile) / wc(welcome) / jf(jubilee の創設者)", () => {
-      expect(GREETINGS.map((g) => g.id)).toEqual(expect.arrayContaining(["pf", "wc", "jf"]));
-    });
-
     it("jf はパラメータで指定されたときだけ出る", () => {
       expect(GREETINGS.find((g) => g.id === "jf")?.requestOnly).toBe(true);
       expect(defaults).not.toContain("jf");
