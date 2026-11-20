@@ -5,15 +5,5 @@
       "path": "/api/cron/calender",
       "schedule": "0 20 * * *"
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/jubilee",
-      "destination": "https://jubilee-web-nine.vercel.app/jubilee"
-    },
-    {
-      "source": "/jubilee/:path*",
-      "destination": "https://jubilee-web-nine.vercel.app/jubilee/:path*"
-    }
   ]
 }

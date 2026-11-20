@@ -25,6 +25,17 @@ npm run dev
 npm run dev -- --open
 ```
 
+## /jubilee(Vercel Microfrontends)
+
+`/jubilee` 以下は別リポジトリの [jubilee-web](https://github.com/n2-freevas/jubilee-web) が配信する。振り分けは Vercel Microfrontends で、このアプリがデフォルトアプリ。ルーティング表は [microfrontends.json](microfrontends.json)。
+
+手元で `/jubilee` も含めて見るときは、`npm run dev` と並べて proxy を動かし、http://localhost:3024 を開く。
+
+```bash
+npm run dev:proxy                                              # /jubilee は本番の www.n2freevas.com から取る
+npx microfrontends proxy --local-apps n2-freevas-web jubilee-web  # jubilee-web も手元(1541 番)で動かしているとき
+```
+
 ## Building
 
 To create a production version of your app:

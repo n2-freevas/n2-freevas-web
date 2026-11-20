@@ -1,0 +1,18 @@
+{
+	"$schema": "https://openapi.vercel.sh/microfrontends.json",
+	"applications": {
+		"n2-freevas-web": {
+			"development": {
+				"local": 5173,
+				"fallback": "www.n2freevas.com"
+			}
+		},
+		"jubilee-web": {
+			"routing": [{ "group": "jubilee", "paths": ["/jubilee", "/jubilee/:path*"] }],
+			"development": {
+				"local": 1541,
+				"fallback": "www.n2freevas.com"
+			}
+		}
+	}
+}
