@@ -6,14 +6,16 @@
       "schedule": "0 20 * * *"
     }
   ],
-  "rewrites": [
+  "redirects": [
     {
       "source": "/jubilee",
-      "destination": "https://jubilee-web-nine.vercel.app/jubilee"
+      "destination": "https://jubilee.n2freevas.com/",
+      "permanent": true
     },
     {
       "source": "/jubilee/:path*",
-      "destination": "https://jubilee-web-nine.vercel.app/jubilee/:path*"
+      "destination": "https://jubilee.n2freevas.com/:path*",
+      "permanent": true
     }
   ]
 }
